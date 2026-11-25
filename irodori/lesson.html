@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>授業コンソール | いろどり 日本語クラス</title>
+<title>授業コンソール | 日本語クラス（いろどり）</title>
 <link rel="stylesheet" href="css/style.css">
 <style>
 main.wide{max-width:1500px;padding:14px 18px}
@@ -121,7 +121,7 @@ $('aVocab').href='vocab.html?n='+N; $('aMoji').href = N===102?'kana.html?s=kata'
 localStorage.setItem('ir:lastLesson', N);
 $('markDone').onclick = ()=>{ const s0=Students.cur(); if(!s0){ toast('先に「生徒・進捗」で生徒を追加してください'); return; } Students.setRec(s0.id, N, {status:'授業済', date:new Date().toISOString().slice(0,10)}); toast(s0.name+' さん: '+(N<100&&N!==26?'第'+N+'課':L.title)+' を授業済にしました'); }; $('finish').onclick = ()=>{ if(Students.cur()) $('markDone').onclick(); location.href='review.html?n='+N+'&print=1'; }; let blank = false; let big = false;
 const LAB = N===26 ? L.title+'(文法・語彙・文化の補足教材)' : N<100 ? '第'+N+'課 '+L.title : L.title+'(文字の授業)';
-document.title = LAB+' | いろどり 日本語クラス';
+document.title = LAB+' | 日本語クラス（いろどり）';
 $('title').textContent = LAB;
 $('goal').textContent = (L.info.find(r=>r[0]==='文型')||[,''])[1];
 

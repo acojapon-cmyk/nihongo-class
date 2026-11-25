@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ひらがな・カタカナ | いろどり 日本語クラス</title>
+<title>ひらがな・カタカナ | 日本語クラス（いろどり）</title>
 <link rel="stylesheet" href="css/style.css">
 <style>.kana2{grid-template-columns:minmax(0,1.15fr) minmax(300px,1fr)}@media(max-width:900px){.kana2{grid-template-columns:minmax(0,1fr)}}.chart{display:block;overflow-x:auto}</style>
 </head>
@@ -65,7 +65,7 @@
 renderHeader('', '');
 const q = new URLSearchParams(location.search); const S = q.get('s')==='kata' ? 'kata' : 'hira';
 const D = KANA[S], $ = id=>document.getElementById(id);
-$('ttl').textContent = D.name; document.title = D.name+' | いろどり 日本語クラス';
+$('ttl').textContent = D.name; document.title = D.name+' | 日本語クラス（いろどり）';
 $(S==='hira'?'swHira':'swKata').classList.add('on');
 $('lessonLink').style.display='none';
 const cells = (secId)=>D.sections.filter(s=>!secId||secId==='all'||s.id===secId).flatMap(s=>s.rows.flatMap(r=>r.cells.filter(Boolean)));
