@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>質問・クイズ | いろどり 日本語クラス</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<main>
+  <h1>質問・クイズ <span class="pill" id="bankInfo"></span></h1>
+  <p class="sub">課を選んで、口頭の質問カード(答えを見て ○× を記録)か、ことばの4択クイズを出せます。授業の最初の復習や、最後の確認に使えます。</p>
+
+  <div class="card noprint" style="margin-bottom:16px">
+    <div class="row">
+      <label style="margin:0">課</label><select id="lsel" style="width:auto"></select>
+      <label style="margin:0">範囲</label>
+      <select id="scope" style="width:auto">
+        <option value="one">この課だけ</option>
+        <option value="upto">第1課〜この課まで(復習)</option>
+        <option value="all">ぜんぶの課</option>
+        <option value="mine">じぶんの 質問だけ</option>
+      </select>
+      <label style="margin:0">形式</label>
+      <select id="mode" style="width:auto">
+        <option value="oral">口頭の質問カード</option>
+        <option value="mc">4択(ことば)</option>
+      </select>
+      <span id="mcOpt" style="display:none"><label style="margin:0">むき</label>
+        <select id="dir" style="width:auto"><option value="wm">ことば → いみ</option><option value="mw">いみ → ことば</option><option value="mix">ミックス</option></select></span>
+      <label style="margin:0">数</label>
+      <select id="cnt" style="width:auto"><option value="5">5問</option><option value="10" selected>10問</option><option value="20">20問</option><option value="999">ぜんぶ</option></select>
+      <button class="btn-primary" id="start">▶ はじめる</button>
+      <button id="toggleRuby">ふりがな ON/OFF</button>
+      <button id="openPresent" title="生徒に見せる画面を別ウィンドウで開きます。このウィンドウは共有しません。">🖥 生徒画面を開く</button>
+      <span class="pill" id="liveQ" style="background:#f2f2f2;color:#777">生徒画面: 未接続</span>
+    </div>
+  </div>
+
+  <div id="area"><div class="stage"><div class="mid">課と形式を えらんで 「はじめる」を おしてください。</div></div></div>
+
+  <section class="card noprint" style="margin-top:24px">
+    <h2>じぶんの 質問カードを追加</h2>
+    <p class="sub" style="margin-bottom:8px">1行に1問。「質問 | 答え」の形で入力します(漢字{かんじ} でふりがな)。生徒の仕事や国など、その人専用の質問を足せます。範囲で「じぶんの 質問だけ」を選ぶと出ます。「ぜんぶの課」にも まざります。</p>
+    <textarea id="bulk" style="min-height:160px"></textarea>
+    <div class="row" style="margin-top:8px"><button class="btn-primary" id="saveBulk">保存</button></div>
+  </section>
+</main>
+<script src="../data/index.js?v=5"></script>
+<script src="../data/quiz.js?v=5"></script>
+<script src="../js/app.js?v=5"></script>
+<script src="../js/quiz.js?v=5"></script>
+<script>
+renderHeader('pages/quiz.html','../');
+const $ = id => document.getElementById(id);
+function speak(t){ try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(String(t).replace(/\{[^}]*\}/g,'').replace(/[○]/g,'')); u.lang='ja-JP'; u.rate=.85; speechSynthesis.speak(u); }catch(e){} }
+const IDX = (window.LESSON_INDEX||[]).filter(l=>l.n<100||l.n===26 || true);
+/* 課の並び: 第1課〜26課(その他)、ひらがな・カタカナ */
+const ORDER = IDX.map(l=>l.n).sort((a,b)=>a-b);
+const label = n => { const l=IDX.find(x=>x.n===n); return l? l.label+' '+l.title : String(n); };
+const SEED = 'おなまえは なんですか。 | わたしは ○○です。\nどこから 来{き}ましたか。 | ○○から 来{き}ました。\nこれは いくらですか。 | ○○円{えん}です。\nお仕事{しごと}は なんですか。 | わたしは ○○です。';
+let raw = store.get('quiz', SEED);
+function mine(){ return raw.split('\n').filter(l=>l.trim()).map(l=>{ const [q,a]=l.split('|'); return [ (q||'').trim(), (a||'').trim() ]; }); }
+const bank = window.QUIZ_BANK||{};
+$('lsel').innerHTML = ORDER.filter(n=>IDX.some(l=>l.n===n)).map(n=>'<option value="'+n+'">'+esc(label(n))+(bank[n]?' ('+bank[n].length+'問)':'')+'</option>').join('');
+const last = parseInt(localStorage.getItem('ir:lastLesson')||'0'); if(last && ORDER.includes(last)) $('lsel').value = last;
+const total = Object.values(bank).reduce((a,v)=>a+v.length,0) + mine().length;
+$('bankInfo').textContent = '質問 '+total+'問';
+$('mode').onchange = ()=>{ $('mcOpt').style.display = $('mode').value==='mc' ? 'inline' : 'none'; };
+function lessonsInScope(){
+  const n = +$('lsel').value, s = $('scope').value;
+  if(s==='one') return [n];
+  if(s==='upto') return n>=100 ? [n] : ORDER.filter(x=>x<=n && x<100);
+  if(s==='all') return ORDER;
+  return [];
+}
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function oralCards(){
+  const s = $('scope').value; let cards=[];
+  lessonsInScope().forEach(n=>{ (bank[n]||[]).forEach(([q,a])=>cards.push({t:label(n), p:ruby(q), a:ruby(a), speak:q})); });
+  if(s==='mine'||s==='all') mine().forEach(([q,a])=>cards.push({t:'じぶんの 質問', p:ruby(q), a:ruby(a), speak:q}));
+  return cards;
+}
+const cache = {};
+function loadL(n){ return new Promise(res=>{ if(cache[n]) return res(cache[n]); window.LESSONS = window.LESSONS||{}; if(window.LESSONS[n]) return res(cache[n]=window.LESSONS[n]);
+  const sc=document.createElement('script'); sc.src='../data/L'+String(n).padStart(2,'0')+'.js'; sc.onload=()=>res(cache[n]=window.LESSONS[n]); sc.onerror=()=>res(null); document.head.appendChild(sc); }); }
+async function mcQuestions(){
+  const lessons = lessonsInScope(); const pairs=[];
+  for(const n of lessons){ const L = await loadL(n); if(!L) continue;
+    (L.vocab||[]).forEach(v=>{ if(v.w && v.m && v.w.length<=22 && v.m.length<=30 && !/[→=]/.test(v.w) && !/^[⇔]/.test(v.m)) pairs.push({w:v.w.trim(), m:v.m.trim()}); }); }
+  const seen=new Set(), uniq=pairs.filter(p=>!seen.has(p.w) && seen.add(p.w));
+  const ms=[...new Set(uniq.map(p=>p.m))], ws=[...new Set(uniq.map(p=>p.w))];
+  if(ms.length<4) return [];
+  const dir=$('dir').value;
+  return shuffle(uniq).map(p=>{
+    const rev = dir==='mw' || (dir==='mix' && Math.random()<.5);
+    if(!rev){ const o=[p.m].concat(Quiz.distract(p.m, ms, 3)); return {p:esc(p.w), a:p.m, o}; }
+    const o=[p.w].concat(Quiz.distract(p.w, ws, 3)); return {p:'<span style="font-size:30px">'+esc(p.m)+'</span>', a:p.w, o};
+  }).filter(q=>q.o.length>=4);
+}
+async function start(){
+  const n=+$('cnt').value, area=$('area');
+  if($('mode').value==='oral'){
+    let cards = shuffle(oralCards());
+    if(!cards.length){ area.innerHTML='<div class="stage"><div class="mid">この範囲には 質問が ありません。</div></div>'; return; }
+    cards = cards.slice(0,n); Quiz.cards(area, cards);
+  } else {
+    area.innerHTML='<div class="stage"><div class="mid">じゅんび中…</div></div>';
+    const qs=(await mcQuestions()).slice(0,n);
+    if(!qs.length){ area.innerHTML='<div class="stage"><div class="mid">この範囲には 4択に できる ことばが 足りません。範囲を ひろげてください。(「ぜんぶの課」など)</div></div>'; return; }
+    Quiz.run(area, qs, act=>{ if(act==='again') start(); else area.innerHTML='<div class="stage"><div class="mid">課と形式を えらんで 「はじめる」を おしてください。</div></div>'; });
+  }
+}
+$('start').onclick = start;
+/* ---- 生徒画面(別ウィンドウ)へ、いまの問題を送る ---- */
+const qch = ('BroadcastChannel' in window) ? new BroadcastChannel('ir-quiz') : null;
+function snapshot(){
+  const c = $('area').cloneNode(true);
+  c.querySelectorAll('button:not(.qo)').forEach(b=>b.remove());
+  c.querySelectorAll('.row').forEach(r=>{ if(!r.textContent.trim()) r.remove(); });
+  c.querySelectorAll('.qo').forEach(b=>b.removeAttribute('data-v'));
+  c.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));
+  return c.innerHTML;
+}
+let pend=false;
+function sendQ(){ pend=false; const m={type:'quiz', html:snapshot(), hideRuby:document.body.classList.contains('hide-ruby')};
+  if(qch) qch.postMessage(m); try{ localStorage.setItem('ir:quizsync', JSON.stringify(Object.assign({t:Date.now()},m))); }catch(e){} }
+function queueQ(){ if(!pend){ pend=true; setTimeout(sendQ,40); } }
+new MutationObserver(queueQ).observe($('area'),{childList:true,subtree:true,attributes:true,characterData:true});
+if(qch) qch.onmessage = e => { if(e.data && e.data.type==='hello'){ sendQ(); const l=$('liveQ'); l.textContent='生徒画面: 接続中'; l.style.background='#eef6ec'; l.style.color='var(--green)'; } };
+window.addEventListener('storage', e => { if(e.key==='ir:quizhello'){ sendQ(); const l=$('liveQ'); l.textContent='生徒画面: 接続中'; l.style.background='#eef6ec'; l.style.color='var(--green)'; } });
+$('openPresent').onclick = ()=>{ const w=window.open('quiz-present.html','ir-quiz-present','width=1280,height=720'); if(!w) toast('ポップアップがブロックされました。許可してください'); setTimeout(sendQ,800); };
+$('toggleRuby').onclick = ()=>{ document.body.classList.toggle('hide-ruby'); queueQ(); };
+$('saveBulk').onclick = ()=>{ raw = $('bulk').value; store.set('quiz', raw); $('bankInfo').textContent='質問 '+(Object.values(bank).reduce((a,v)=>a+v.length,0)+mine().length)+'問'; toast('保存しました'); };
+$('bulk').value = raw;
+</script>
+</body>
+</html>

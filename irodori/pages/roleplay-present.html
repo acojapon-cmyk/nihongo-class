@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ロールプレイ(生徒画面) | いろどり 日本語クラス</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+body{background:#fff;margin:0;overflow-x:hidden}
+#view{max-width:1100px;margin:0 auto;padding:28px 36px}
+.rtitle{font-size:46px;font-weight:700;line-height:1.5}
+.rsit{font-size:28px;margin-top:8px;line-height:1.6}
+.en{color:#555;font-size:.6em;font-weight:400;font-family:Arial,Helvetica,sans-serif;display:block;margin-top:2px}
+.rtitle+.en,.rsit+.en{font-size:22px}
+.rroles{margin:16px 0 10px;display:flex;gap:10px;flex-wrap:wrap}
+.rroles .pill{font-size:20px;padding:4px 16px}
+.rroles .me{background:#eef6ec;color:var(--green)}
+.bubble{margin:14px 0;padding:14px 20px;max-width:92%}
+.bubble b{font-size:18px}
+.bubble .jp{font-size:36px;line-height:1.7;display:block}
+.bubble .en{font-size:22px}
+.hide-en .en{display:none}
+.hidden-ans{cursor:default}
+@media(max-width:700px){#view{padding:16px 12px}.rtitle{font-size:28px}.rsit{font-size:19px}.rtitle+.en,.rsit+.en{font-size:16px}.bubble{max-width:100%;padding:10px 14px}.bubble .jp{font-size:24px}.bubble .en{font-size:16px}.rroles .pill{font-size:16px}.wait{font-size:22px!important}}
+.wait{display:flex;align-items:center;justify-content:center;min-height:90vh;color:#999;font-size:34px}
+</style>
+</head>
+<body>
+<div id="view"><div class="wait">ロールプレイの じゅんび中…</div></div>
+<script src="../js/app.js?v=5"></script>
+<script>
+const view = document.getElementById('view');
+const ch = ('BroadcastChannel' in window) ? new BroadcastChannel('ir-roleplay') : null;
+function apply(m){
+  if(!m || m.type!=='rp') return;
+  document.body.classList.toggle('hide-ruby', !!m.hideRuby);
+  view.innerHTML = m.html || '<div class="wait">ロールプレイの じゅんび中…</div>';
+}
+if(ch) ch.onmessage = e => apply(e.data);
+window.addEventListener('storage', e => { if(e.key==='ir:rpsync'){ try{ apply(JSON.parse(e.newValue)); }catch(_){} } });
+function hello(){ const m={type:'hello'}; if(ch) ch.postMessage(m); try{ localStorage.setItem('ir:rphello', String(Date.now())); }catch(_){} }
+hello(); setInterval(()=>{ if(view.querySelector('.wait')) hello(); }, 3000);
+</script>
+</body>
+</html>

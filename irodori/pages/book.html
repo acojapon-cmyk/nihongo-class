@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>本冊 | いろどり 日本語クラス</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>table.bk{border-collapse:collapse;width:100%;background:#fff}table.bk th,table.bk td{border:1px solid var(--line);padding:8px 10px}table.bk th{background:#f4efe6;text-align:left}table.bk a{color:var(--blue);text-decoration:underline}</style>
+</head>
+<body>
+<main>
+  <h1>本冊 <span class="pill">Coursebook</span></h1>
+  <p class="sub">『いろどり 生活の日本語』入門(A1)の本冊を、課ごとに分けたPDFです(出典: 国際交流基金)。音声の番号(例: 05-03)は、本冊の各活動に載っているものと同じです。</p>
+  <section class="card"><div style="overflow-x:auto"><table class="bk" id="tb"></table></div></section>
+  <p class="sub" style="margin-top:12px">全体PDF(515ページ)を <code>book/X_all.pdf</code> として置くと、下のリンクから開けます: <a id="full" href="../book/X_all.pdf" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:underline">本冊 全体PDF</a> ／ 公式サイト: <a href="https://www.irodori.jpf.go.jp/" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:underline">irodori.jpf.go.jp</a></p>
+</main>
+<script src="../data/index.js?v=5"></script>
+<script src="../data/audio.js?v=5"></script>
+<script src="../js/app.js?v=5"></script>
+<script>
+renderHeader('pages/book.html','../');
+const rows = [['はじめに・使い方・教室のことば(前付)','book_front.pdf',0,'']];
+LESSON_INDEX.forEach(l=>rows.push([l.label+' '+l.title,'book_L'+String(l.n).padStart(2,'0')+'.pdf',l.n,l.n]));
+rows.push(['Can-doチェック(巻末)','book_check.pdf',-1,'']);
+document.getElementById('tb').innerHTML='<tr><th>内容</th><th>本冊PDF</th><th>音声</th><th>授業</th></tr>'+rows.map(([t,f,n,ln])=>
+ '<tr><td>'+esc(t)+'</td><td><a href="../book/'+f+'" target="_blank" rel="noopener">📖 開く</a></td><td>'+(n>=0?'<a href="audio.html?n='+n+'">🔊 '+(((window.AUDIO||{})[n]||[]).length)+'本</a>':'')+'</td><td>'+(ln?'<a href="../lesson.html?n='+ln+'">授業コンソール</a>':'')+'</td></tr>').join('');
+</script>
+</body>
+</html>

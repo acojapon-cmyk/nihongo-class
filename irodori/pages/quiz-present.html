@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>クイズ(生徒画面) | いろどり 日本語クラス</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+body{background:#fff;margin:0;overflow-x:hidden}
+#view{max-width:1100px;margin:0 auto;padding:28px 36px}
+#view .stage{min-height:300px}
+#view .stage .big{font-size:56px}
+#view .stage .mid{font-size:34px}
+#view .qopts{pointer-events:none;margin-top:16px}
+#view .qo{font-size:32px;padding:20px 12px}
+#view .pill{font-size:18px}
+@media(max-width:700px){#view{padding:16px 12px}#view .stage{min-height:180px}#view .stage .big{font-size:34px}#view .stage .mid{font-size:22px}#view .qo{font-size:22px;padding:14px 8px}.wait{font-size:22px!important}}
+.wait{display:flex;align-items:center;justify-content:center;min-height:90vh;color:#999;font-size:34px}
+</style>
+</head>
+<body>
+<div id="view"><div class="wait">クイズの じゅんび中…</div></div>
+<script src="../js/app.js?v=5"></script>
+<script>
+const view = document.getElementById('view');
+const ch = ('BroadcastChannel' in window) ? new BroadcastChannel('ir-quiz') : null;
+function apply(m){
+  if(!m || m.type!=='quiz') return;
+  document.body.classList.toggle('hide-ruby', !!m.hideRuby);
+  view.innerHTML = m.html || '<div class="wait">クイズの じゅんび中…</div>';
+}
+if(ch) ch.onmessage = e => apply(e.data);
+window.addEventListener('storage', e => { if(e.key==='ir:quizsync'){ try{ apply(JSON.parse(e.newValue)); }catch(_){} } });
+function hello(){ const m={type:'hello'}; if(ch) ch.postMessage(m); try{ localStorage.setItem('ir:quizhello', String(Date.now())); }catch(_){} }
+hello(); setInterval(()=>{ if(view.querySelector('.wait')) hello(); }, 3000);
+</script>
+</body>
+</html>

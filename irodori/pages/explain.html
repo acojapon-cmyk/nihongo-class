@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>説明資料 | いろどり 日本語クラス</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>.stage .ex{font-size:30px;line-height:1.6}.stage .ex.t{color:var(--blue)}.stage .ex.s{color:var(--green)}.stage .note{color:var(--muted);font-size:18px;margin-top:6px}</style>
+</head>
+<body>
+<main>
+  <h1>説明資料</h1>
+  <p class="sub" style="margin-bottom:6px">▶ <a href="cando.html" style="color:var(--blue);font-weight:700">Can-do説明資料(課別Can-doスライド・対応表)はこちら</a></p>
+  <p class="sub">その課の文型・表現を、教案から取り出したカードで1枚ずつ大きく表示します。画面共有でそのまま使えます。漢字は <code>漢字{かんじ}</code> の形で書くとふりがなが付きます。「✏ 編集」で自分用に直せます(課ごとに保存)。</p>
+
+  <div class="card noprint" style="margin-bottom:16px">
+    <div class="row">
+      <select id="lsel" style="width:auto"></select>
+      <button id="prev">◀ 前</button>
+      <span id="pos" class="pill">0 / 0</span>
+      <button id="next" class="btn-primary">次 ▶</button>
+      <button id="toggleRuby">ふりがな ON/OFF</button>
+      <button id="toggleSize">文字を大きく</button>
+      <button id="toggleEdit" style="margin-left:auto">✏ 編集</button>
+    </div>
+  </div>
+
+  <div class="stage" id="stage"></div>
+
+  <div id="editor" class="card noprint" style="display:none;margin-top:16px">
+    <h2>カードを編集</h2>
+    <label>見出し(文型)</label><input id="eTitle">
+    <label>例文(1行に1文。「T：」「S：」で始めると 先生・生徒の色になります)</label><textarea id="eExamples"></textarea>
+    <label>ポイント・説明(生徒の母語・英語での補足もOK)</label><textarea id="eNote"></textarea>
+    <div class="row" style="margin-top:10px">
+      <button class="btn-primary" id="eSave">保存</button>
+      <button id="eNew">新しいカードを追加</button>
+      <button id="eDel">このカードを削除</button>
+      <button id="eReset">この課を教案の初期カードに戻す</button>
+    </div>
+  </div>
+</main>
+<script src="../data/index.js?v=5"></script>
+<script src="../data/explain.js"></script>
+<script src="../js/app.js?v=5"></script>
+<script>
+renderHeader('pages/explain.html','../');
+const $ = id => document.getElementById(id);
+const q = new URLSearchParams(location.search);
+let N = parseInt(q.get('n')) || parseInt(localStorage.getItem('ir:lastLesson')||'1') || 1;
+$('lsel').innerHTML = LESSON_INDEX.map(l=>'<option value="'+l.n+'"'+(l.n===N?' selected':'')+'>'+esc(l.label)+' '+esc(l.title)+'</option>').join('');
+let cards = [], i = 0, edit = false;
+function key(){ return 'explain2:'+N; }
+function load(){
+  const seed = (window.EXPLAIN||{})[N] || [];
+  cards = store.get(key(), null);
+  if(cards===null){ cards = JSON.parse(JSON.stringify(seed)); }
+  i = 0; show();
+}
+function lineHtml(e){
+  const m = e.match(/^([TS])[：:]\s*(.*)$/);
+  if(m) return '<div class="ex '+(m[1]==='T'?'t':'s')+'"><small style="font-size:.55em;color:var(--muted)">'+(m[1]==='T'?'せんせい':'あなた')+'　</small>'+ruby(m[2])+'</div>';
+  return '<div class="ex">'+ruby(e)+'</div>';
+}
+function show(){
+  if(!cards.length){ $('stage').innerHTML = '<div class="mid">カードがありません。「✏ 編集」から追加してください。</div>'; $('pos').textContent='0 / 0'; return; }
+  i = Math.min(Math.max(i,0), cards.length-1);
+  const c = cards[i];
+  $('stage').innerHTML = '<div class="big">'+ruby(c.title)+'</div>' + c.examples.map(lineHtml).join('') + (c.note ? '<div class="note">'+esc(c.note)+'</div>' : '');
+  $('pos').textContent = (i+1)+' / '+cards.length;
+  $('eTitle').value = c.title; $('eExamples').value = c.examples.join('\n'); $('eNote').value = c.note||'';
+}
+$('lsel').onchange = ()=>{ N = +$('lsel').value; localStorage.setItem('ir:lastLesson', N); load(); };
+$('prev').onclick = ()=>{ i--; show(); };
+$('next').onclick = ()=>{ i++; show(); };
+document.addEventListener('keydown', e=>{ if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return; if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();i++;show();} if(e.key==='ArrowLeft'){i--;show();} });
+$('toggleRuby').onclick = ()=>document.body.classList.toggle('hide-ruby');
+$('toggleSize').onclick = ()=>document.body.classList.toggle('big-on');
+$('toggleEdit').onclick = ()=>{ edit=!edit; $('editor').style.display = edit?'block':'none'; };
+$('eSave').onclick = ()=>{ if(!cards.length) return; cards[i] = {title:$('eTitle').value, examples:$('eExamples').value.split('\n').filter(Boolean), note:$('eNote').value}; store.set(key(),cards); show(); toast('保存しました'); };
+$('eNew').onclick = ()=>{ cards.push({title:'新しい文型', examples:['例文'], note:''}); i = cards.length-1; store.set(key(),cards); show(); edit=true; $('editor').style.display='block'; };
+$('eDel').onclick = ()=>{ if(!cards.length||!confirm('削除しますか?')) return; cards.splice(i,1); store.set(key(),cards); show(); };
+$('eReset').onclick = ()=>{ if(!confirm('この課のカードを、教案の初期カードに戻しますか?(自分の編集は消えます)')) return; localStorage.removeItem('ir:'+key()); load(); };
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>語彙カード | いろどり 日本語クラス</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.stage .big{font-size:72px}
+.stage .mid{font-size:34px;color:var(--blue)}
+.big-on .stage .big{font-size:96px}
+.gtag{position:absolute;top:14px;left:18px}
+.stagewrap{position:relative}
+@media(max-width:600px){.stage .big{font-size:42px}.stage .mid{font-size:22px}.big-on .stage .big{font-size:50px}.gtag{top:8px;left:10px}}
+.bar2{height:8px;background:#eee;border-radius:4px;margin:10px 0}
+.bar2 i{display:block;height:100%;background:var(--green);border-radius:4px;transition:width .2s}
+</style>
+</head>
+<body>
+<main>
+  <div class="row" style="justify-content:space-between;margin-bottom:10px">
+    <h1 style="margin:0">語彙カード <span class="pill" id="lname"></span></h1>
+    <div class="row noprint">
+      <select id="lsel" style="width:auto"></select>
+      <a class="btn" id="toLesson" style="padding:8px 14px;border:1px solid var(--line);border-radius:9px;background:#fff">授業コンソールへ</a>
+    </div>
+  </div>
+  <div class="card noprint" style="margin-bottom:12px">
+    <div class="row">
+      <label style="margin:0">表示</label>
+      <select id="mode" style="width:auto"><option value="wm">ことば → いみ</option><option value="mw">いみ → ことば</option><option value="w">ことばだけ(読む練習)</option></select>
+      <label style="margin:0">グループ</label><select id="grp" style="width:auto"></select>
+      <button id="shuffle">🔀 シャッフル</button>
+      <button id="restart">↺ 最初から</button>
+      <button id="big">文字を大きく</button>
+      <span class="pill" id="pos"></span><span class="pill" style="background:#eef6ec;color:var(--green)" id="score"></span>
+    </div>
+    <div class="bar2"><i id="prog" style="width:0"></i></div>
+  </div>
+  <div class="stagewrap"><span class="pill gtag" id="gtag"></span><div class="stage" id="stage" style="cursor:pointer"></div></div>
+  <div class="row noprint" style="margin-top:12px;justify-content:center">
+    <button id="prev">◀ 前</button>
+    <button id="flip" class="btn-primary">答え / めくる <kbd>Space</kbd></button>
+    <button id="ok" style="color:var(--green)">○ 言えた</button>
+    <button id="ng" style="color:var(--accent)">× もう一回</button>
+    <button id="next">次 ▶</button>
+    <a id="toSlide" class="small" style="margin-left:8px;color:var(--blue);text-decoration:underline"></a>
+  </div>
+
+  <section class="card noprint" style="margin-top:22px">
+    <h2>自分のことばを追加(この課)</h2>
+    <p class="sub" style="margin:0 0 6px">1行に1語。「ことば | いみ」の形。生徒の職業や国など、その人専用の語彙を足せます。</p>
+    <textarea id="extra" style="min-height:90px" placeholder="例: エンジニア | engineer"></textarea>
+    <div class="row" style="margin-top:8px"><button class="btn-primary" id="saveExtra">追加を保存</button></div>
+  </section>
+</main>
+<script src="data/index.js?v=5"></script>
+<script src="js/app.js?v=5"></script>
+<script>
+renderHeader('', '');
+const q = new URLSearchParams(location.search); const N = parseInt(q.get('n'))||1;
+const $ = id=>document.getElementById(id);
+$('lsel').innerHTML = LESSON_INDEX.map(l=>'<option value="'+l.n+'"'+(l.n===N?' selected':'')+'>'+esc(l.label)+' '+esc(l.title)+'</option>').join('');
+$('lsel').onchange = ()=>location.href='vocab.html?n='+$('lsel').value;
+$('toLesson').href = 'lesson.html?n='+N;
+let cards=[], all=[], idx=0, shown=false, ok=0, ng=0;
+loadLesson(N, L=>{
+  if(!L){ $('stage').textContent='データがありません'; return; }
+  $('lname').textContent = (N<100&&N!==26) ? '第'+N+'課 '+L.title : L.title;
+  const extra = store.get('vocabExtra:'+N, '');
+  $('extra').value = extra;
+  all = L.vocab.concat(extra.split('\n').filter(l=>l.trim()).map(l=>{ const [w,m]=l.split('|'); return {w:(w||'').trim(), m:(m||'').trim(), s:0, g:'追加'}; }));
+  const groups = [...new Set(all.map(c=>c.g))];
+  $('grp').innerHTML = '<option value="">ぜんぶ ('+all.length+')</option>'+groups.map(g=>'<option>'+esc(g)+'</option>').join('');
+  $('grp').onchange = restart; restart();
+});
+function restart(){ const g=$('grp').value; cards = all.filter(c=>!g||c.g===g); idx=0; ok=0; ng=0; shown=false; draw(); }
+function draw(){
+  if(!cards.length){ $('stage').innerHTML='<div class="mid">この課には語彙スライドがありません。下で追加できます。</div>'; $('pos').textContent=''; return; }
+  if(idx>=cards.length){ $('stage').innerHTML='<div class="big">おつかれさまでした!</div><div class="mid">○ '+ok+' / × '+ng+'</div>'; $('pos').textContent='終了'; $('prog').style.width='100%'; return; }
+  const c=cards[idx], mode=$('mode').value;
+  const front = mode==='mw' ? (c.m||c.w) : c.w;
+  const back = mode==='mw' ? c.w : (c.m || '(スライド'+c.s+'で確認)');
+  $('stage').innerHTML = '<div class="big">'+esc(front)+'</div>' + (mode==='w' ? '' : '<div class="mid '+(shown?'':'hidden-ans')+'">'+esc(back)+'</div>');
+  $('gtag').textContent = c.g; $('gtag').style.display = c.g?'inline-block':'none';
+  $('pos').textContent=(idx+1)+' / '+cards.length; $('score').textContent='○'+ok+' ×'+ng; $('prog').style.width=(idx/cards.length*100)+'%';
+  const a=$('toSlide'); if(c.s){ a.href='lesson.html?n='+N+'&s='+c.s; a.textContent='スライド'+c.s+'を見る'; } else { a.textContent=''; }
+}
+function nxt(){ idx++; shown=false; draw(); }
+$('flip').onclick = ()=>{ shown=!shown; draw(); };
+$('stage').onclick = ()=>{ shown=!shown; draw(); };
+$('ok').onclick = ()=>{ if(idx<cards.length){ ok++; nxt(); } };
+$('ng').onclick = ()=>{ if(idx<cards.length){ ng++; cards.push(cards[idx]); nxt(); } };
+$('next').onclick = nxt; $('prev').onclick = ()=>{ idx=Math.max(0,idx-1); shown=false; draw(); };
+$('mode').onchange = ()=>{ shown=false; draw(); };
+$('restart').onclick = restart;
+$('shuffle').onclick = ()=>{ for(let i=cards.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [cards[i],cards[j]]=[cards[j],cards[i]]; } idx=0; ok=0; ng=0; shown=false; draw(); };
+$('big').onclick = ()=>document.body.classList.toggle('big-on');
+$('saveExtra').onclick = ()=>{ store.set('vocabExtra:'+N, $('extra').value); toast('保存しました'); location.reload(); };
+document.addEventListener('keydown', e=>{
+  if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+  if(e.key===' '){ e.preventDefault(); shown=!shown; draw(); } else if(e.key==='ArrowRight'){ nxt(); } else if(e.key==='ArrowLeft'){ idx=Math.max(0,idx-1); shown=false; draw(); }
+});
+</script>
+</body>
+</html>

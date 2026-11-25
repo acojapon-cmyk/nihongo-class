@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ひらがな・カタカナ | いろどり 日本語クラス</title>
+<link rel="stylesheet" href="css/style.css">
+<style>.kana2{grid-template-columns:minmax(0,1.15fr) minmax(300px,1fr)}@media(max-width:900px){.kana2{grid-template-columns:minmax(0,1fr)}}.chart{display:block;overflow-x:auto}</style>
+</head>
+<body>
+<main>
+  <div class="row" style="justify-content:space-between;margin-bottom:10px">
+    <h1 style="margin:0" id="ttl"></h1>
+    <div class="row noprint">
+      <a class="tab" id="swHira" href="kana.html?s=hira">ひらがな</a><a class="tab" id="swKata" href="kana.html?s=kata">カタカナ</a><a class="tab" href="kanji.html">漢字</a>
+      <a class="btn" id="lessonLink" style="padding:8px 14px;border:1px solid var(--line);border-radius:9px;background:#fff">授業スライドへ</a>
+    </div>
+  </div>
+  <div class="row noprint" style="margin-bottom:14px">
+    <button class="tab on" data-t="chart">文字表・ことば</button><button class="tab" data-t="list">ぜんぶの ことば(50音順)</button><button class="tab" data-t="quiz">クイズ</button><button class="tab" data-t="oral">質問カード(口頭)</button>
+  </div>
+
+  <!-- 文字表 -->
+  <div id="tChart">
+    <div class="row noprint" id="secs" style="margin-bottom:10px"></div>
+    <div class="grid kana2" style="align-items:start">
+      <section class="card" style="overflow:auto"><table class="chart" id="chart"></table></section>
+      <section class="card" id="detail">
+        <div class="sub">左の文字をクリックしてください。</div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ことば一覧 -->
+  <div id="tList" style="display:none">
+    <div class="row noprint" style="margin-bottom:10px"><button onclick="window.print()">🖨 印刷</button><span class="sub" style="margin:0">すべての もじと ことばの れいです。ことばを クリックすると よみあげます。</span></div>
+    <div id="allWords"></div>
+  </div>
+
+  <!-- クイズ -->
+  <div id="tQuiz" style="display:none">
+    <section class="card" id="qset">
+      <h2>クイズの設定</h2>
+      <div class="row">
+        <div><label>しゅるい</label><select id="qmode"></select></div>
+        <div><label>はんい</label><select id="qscope"></select></div>
+        <div><label>もんだいの かず</label><select id="qn"><option>10</option><option>20</option><option>5</option></select></div>
+      </div>
+      <div class="row" style="margin-top:14px"><button class="btn-primary" id="qgo" style="font-size:18px;padding:10px 26px">▶ はじめる</button><span class="sub" style="margin:0">音のクイズは、ブラウザの音声(日本語)を使います。</span></div>
+    </section>
+    <div id="qarea" style="display:none"></div>
+  </div>
+
+  <!-- 口頭 -->
+  <div id="tOral" style="display:none">
+    <section class="card noprint" style="margin-bottom:12px">
+      <div class="row"><label style="margin:0">しゅるい</label><select id="omode" style="width:auto"></select><label style="margin:0">はんい</label><select id="oscope" style="width:auto"></select><button class="btn-primary" id="ogo">▶ カードを出す</button></div>
+    </section>
+    <div id="oarea"></div>
+  </div>
+</main>
+<script src="data/index.js?v=5"></script><script src="data/kana.js"></script>
+<script src="js/app.js?v=5"></script><script src="js/pad.js?v=5"></script><script src="js/quiz.js?v=5"></script>
+<script>
+renderHeader('', '');
+const q = new URLSearchParams(location.search); const S = q.get('s')==='kata' ? 'kata' : 'hira';
+const D = KANA[S], $ = id=>document.getElementById(id);
+$('ttl').textContent = D.name; document.title = D.name+' | いろどり 日本語クラス';
+$(S==='hira'?'swHira':'swKata').classList.add('on');
+$('lessonLink').style.display='none';
+const cells = (secId)=>D.sections.filter(s=>!secId||secId==='all'||s.id===secId).flatMap(s=>s.rows.flatMap(r=>r.cells.filter(Boolean)));
+const usable = c=>D.words[c.c] && D.words[c.c].w.length;  // ことばがある文字
+let curSec = 'sei', pad = null;
+
+/* ---- タブ ---- */
+document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x===b));
+  $('tChart').style.display=b.dataset.t==='chart'?'block':'none'; $('tList').style.display=b.dataset.t==='list'?'block':'none'; $('tQuiz').style.display=b.dataset.t==='quiz'?'block':'none'; $('tOral').style.display=b.dataset.t==='oral'?'block':'none';
+});
+
+/* ---- 文字表 ---- */
+$('secs').innerHTML = D.sections.map(s=>'<button class="chip'+(s.id===curSec?' on':'')+'" data-s="'+s.id+'">'+s.name+'</button>').join('');
+document.querySelectorAll('#secs .chip').forEach(b=>b.onclick=()=>{ curSec=b.dataset.s; document.querySelectorAll('#secs .chip').forEach(x=>x.classList.toggle('on',x===b)); drawChart(); });
+function drawChart(){
+  const sec = D.sections.find(s=>s.id===curSec);
+  $('chart').innerHTML = sec.rows.map(r=>'<tr><th>'+esc(r.l)+'</th>'+r.cells.map(c=>c?'<td><button class="kc" data-c="'+esc(c.c)+'">'+esc(c.c)+'<small>'+esc(c.r)+'</small></button></td>':'<td></td>').join('')+'</tr>').join('');
+  document.querySelectorAll('#chart .kc').forEach(b=>b.onclick=()=>showChar(b.dataset.c));
+}
+function hl(word, ch){ const e=esc(word), c=esc(ch); return ch.length? e.split(c).join('<mark>'+c+'</mark>') : e; }
+function showChar(ch){
+  document.querySelectorAll('#chart .kc').forEach(b=>b.classList.toggle('on',b.dataset.c===ch));
+  const cell = cells('all').find(c=>c.c===ch) || {c:ch,r:''}; const w = D.words[ch] || {w:[],n:''};
+  $('detail').innerHTML = '<div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="bigch">'+esc(ch)+'</div><div style="text-align:center;font-size:22px;color:var(--muted)">'+esc(cell.r)+'</div></div><div id="padbox"></div></div>'+
+    '<div class="row" style="margin:8px 0"><button id="spk">🔊 きく</button></div>'+
+    '<h3>この もじを つかった ことば</h3>'+
+    (w.w.length? w.w.map(x=>'<div class="wd"><span>'+hl(x[0],ch)+'</span><button class="small-btn" data-sp="'+esc(x[0])+'">🔊</button><span class="m">'+esc(x[1])+'</span></div>').join('') : '<div class="sub">ことばの れいは ありません。</div>')+
+    (w.n?'<p class="sub" style="margin-top:8px">📝 '+esc(w.n)+'</p>':'');
+  $('spk').onclick = ()=>speak(ch.replace(/[っッー]/g,'')||ch);
+  document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>speak(b.dataset.sp));
+  pad = WritePad($('padbox'), 230); pad.set(ch);
+}
+drawChart();
+
+/* ---- ぜんぶの ことば(50音順) ---- */
+$('allWords').innerHTML = D.sections.map(sec=>'<section class="card" style="margin-bottom:14px"><h2>'+esc(sec.name)+'</h2><table style="width:100%;border-collapse:collapse">'+
+  sec.rows.map(r=>r.cells.filter(Boolean).map(c=>{ const w=D.words[c.c]||{w:[],n:''};
+    return '<tr style="border-bottom:1px solid var(--line)"><td style="width:70px;font-size:34px;font-family:serif;text-align:center">'+esc(c.c)+'</td><td style="width:70px;color:var(--muted)">'+esc(c.r)+'</td><td style="padding:6px 0">'+
+      (w.w.length? w.w.map(x=>'<span class="aw" data-sp="'+esc(x[0])+'" style="display:inline-block;margin:2px 14px 2px 0;cursor:pointer"><span style="font-size:22px">'+hl(x[0],c.c)+'</span> <small style="color:var(--muted)">'+esc(x[1])+'</small></span>').join('') : '<span class="sub">—</span>')+
+      (w.n?'<div class="sub" style="margin:2px 0 0;font-size:13px">📝 '+esc(w.n)+'</div>':'')+'</td></tr>'; }).join('')).join('')+'</table></section>').join('');
+document.querySelectorAll('#allWords .aw').forEach(b=>b.onclick=()=>speak(b.dataset.sp));
+
+/* ---- クイズ ---- */
+const MODES = [['c2r','もじ → ローマじ'],['r2c','ローマじ → もじ'],['snd','きこえた おと → もじ'],['w2m','ことば → いみ(えいご)'],['cross', S==='hira'?'ひらがな → カタカナ':'カタカナ → ひらがな'],['wfirst','ことばの はじめの もじは?']];
+$('qmode').innerHTML = MODES.map(m=>'<option value="'+m[0]+'">'+m[1]+'</option>').join('');
+$('omode').innerHTML = '<option value="read">よんでください</option><option value="write">かいてください(ローマじ → もじ)</option><option value="word">この もじで はじまる ことばを いってください</option><option value="cross">'+(S==='hira'?'カタカナで かいてください':'ひらがなで かいてください')+'</option>';
+const SCOPES = D.sections.map(s=>[s.id,s.name]).concat([['all','ぜんぶ']]);
+[$('qscope'),$('oscope')].forEach(sel=>sel.innerHTML = SCOPES.map(s=>'<option value="'+s[0]+'">'+s[1]+'</option>').join(''));
+const toK = h=>h.replace(/[ぁ-ゖ]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60)), toH = k=>k.replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));
+function build(mode, scope, n){
+  let pool = cells(scope).filter(c=>c.r && !/small|long/.test(c.r) || mode==='w2m'); const qs=[];
+  const pure = pool.filter(c=>!/small|long/.test(c.r));
+  const allR = cells('all').filter(c=>!/small|long/.test(c.r));
+  if(mode==='c2r'){ Quiz.pick(pure,n).forEach(c=>qs.push({p:esc(c.c),a:c.r,o:[c.r].concat(Quiz.distract(c.r,pure.concat(allR).map(x=>x.r),3)),speak:c.c})); }
+  if(mode==='r2c'){ Quiz.pick(pure,n).forEach(c=>qs.push({p:esc(c.r),a:c.c,o:[c.c].concat(Quiz.distract(c.c,pure.map(x=>x.c),3))})); }
+  if(mode==='snd'){ Quiz.pick(pure,n).forEach(c=>qs.push({p:'🔊',a:c.c,speak:c.c,o:[c.c].concat(Quiz.distract(c.c,pure.map(x=>x.c),3)),x:esc(c.r)})); }
+  if(mode==='w2m'){ const ws=pure.flatMap(c=>(D.words[c.c]?D.words[c.c].w:[]).map(w=>({w:w[0],m:w[1]}))).filter(w=>!/[=!]/.test(w.m)); const uniq=[...new Map(ws.map(w=>[w.w,w])).values()]; Quiz.pick(uniq,n).forEach(w=>qs.push({p:esc(w.w),a:w.m,speak:w.w,o:[w.m].concat(Quiz.distract(w.m,uniq.map(x=>x.m),3))})); }
+  if(mode==='cross'){ const other = S==='hira'?toK:toH; Quiz.pick(pure.filter(c=>c.c.length<=2),n).forEach(c=>{ const a=other(c.c); qs.push({p:esc(c.c),a,o:[a].concat(Quiz.distract(a,pure.map(x=>other(x.c)),3))}); }); }
+  if(mode==='wfirst'){ const items=pure.flatMap(c=>(D.words[c.c]?D.words[c.c].w:[]).filter(w=>w[0].startsWith(c.c)).map(w=>({w:w[0],m:w[1],c:c.c}))); Quiz.pick(items,n).forEach(it=>qs.push({p:esc(it.w)+'<div class="mid" style="color:var(--muted)">'+esc(it.m)+'</div>',a:it.c,speak:it.w,o:[it.c].concat(Quiz.distract(it.c,pure.map(x=>x.c),3)),x:'はじめの もじ'})); }
+  return qs;
+}
+function startQuiz(){
+  const qs = build($('qmode').value, $('qscope').value, parseInt($('qn').value));
+  if(qs.length<2){ toast('この はんいでは もんだいが つくれません'); return; }
+  $('qset').style.display='none'; $('qarea').style.display='block';
+  Quiz.run($('qarea'), qs, a=>{ if(a==='again') startQuiz(); else { $('qarea').style.display='none'; $('qset').style.display='block'; } });
+}
+$('qgo').onclick = startQuiz;
+
+/* ---- 口頭の質問カード ---- */
+$('ogo').onclick = ()=>{
+  const mode=$('omode').value, pool=cells($('oscope').value).filter(c=>!/small|long/.test(c.r)); const other = S==='hira'?toK:toH;
+  const cards = Quiz.pick(pool, 10).map(c=>{
+    const ex = D.words[c.c] && D.words[c.c].w[0] ? D.words[c.c].w.map(w=>esc(w[0])+'('+esc(w[1])+')').join(' / ') : '—';
+    if(mode==='read') return {t:'この もじを よんでください', p:esc(c.c), a:esc(c.r), speak:c.c};
+    if(mode==='write') return {t:'この おとを かいてください', p:esc(c.r), a:esc(c.c), speak:c.c};
+    if(mode==='word') return {t:'この もじで はじまる ことばを いってください', p:esc(c.c), a:'れい: '+ex, speak:c.c};
+    return {t:(S==='hira'?'カタカナで':'ひらがなで')+' かいてください', p:esc(c.c), a:esc(other(c.c)), speak:c.c};
+  });
+  Quiz.cards($('oarea'), cards);
+};
+</script>
+</body>
+</html>

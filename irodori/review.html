@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>復習プリント | いろどり 日本語クラス</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+main.wide{max-width:1000px}
+.ctl .row{margin-bottom:8px}
+.ctl label.chk{display:inline-flex;align-items:center;gap:4px;margin:0 12px 0 0;font-size:15px;cursor:pointer}
+.ctl label.chk input{width:auto;margin:0}
+.sheet{background:#fff;border:1px solid var(--line);border-radius:12px;padding:26px 32px;margin-top:14px}
+.sheet h1{font-size:28px;margin:0}
+.sheet h2{font-size:20px;border-left:6px solid var(--accent);padding-left:10px;margin:22px 0 8px}
+.sheet .meta{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:6px}
+.sheet .nm{font-size:18px;border-bottom:1px solid var(--ink);min-width:200px;padding:0 6px}
+table.tb{border-collapse:collapse;width:100%;font-size:17px}
+table.tb th,table.tb td{border:1px solid #bbb;padding:5px 9px;vertical-align:top}
+table.tb th{background:#f4efe6;text-align:left}
+.ck{width:34px;text-align:center}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;font-size:15px}
+.two table.tb{table-layout:fixed;width:100%;font-size:14px}
+.two .tb th.ck,.two .tb td.ck{width:30px;padding:4px 2px}
+.two .tb td,.two .tb th{word-break:break-all}
+.goal{display:flex;gap:10px;padding:4px 0;font-size:17px}
+.goal .bx{width:22px;height:22px;border:2px solid var(--ink);border-radius:4px;flex:none;text-align:center;line-height:18px;font-weight:700}
+.q{display:flex;gap:10px;padding:7px 0;font-size:18px;border-bottom:1px dotted #ccc;page-break-inside:avoid}
+.q .no{font-weight:700;color:var(--accent);min-width:28px}
+.q .blank{display:inline-block;border-bottom:1.5px solid var(--ink);min-width:200px;height:1.3em;vertical-align:bottom}
+.q .wide{display:block;border-bottom:1px solid #999;height:1.9em;margin-top:6px}
+.bank{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}
+.bank span{border:1.5px solid var(--blue);border-radius:8px;padding:2px 12px;font-size:18px;color:var(--blue)}
+.sub2{font-size:14px;color:var(--muted);margin:0 0 6px}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.thumbs figure{margin:0;border:1px solid #ccc;border-radius:6px;overflow:hidden;page-break-inside:avoid}
+.thumbs img{width:100%;display:block}
+.thumbs figcaption{font-size:12px;padding:2px 6px;background:#f6f6f6;color:#555}
+.hw{display:flex;gap:8px;font-size:18px;padding:3px 0}
+.nx{background:#eaf3f8;border-radius:10px;padding:10px 14px;margin-top:8px;font-size:17px}
+.pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px;max-height:340px;overflow:auto;padding:6px}
+.pick label{position:relative;display:block;margin:0;cursor:pointer;border:3px solid transparent;border-radius:6px}
+.pick label.on{border-color:var(--accent)}
+.pick img{width:100%;display:block;background:#fff}
+.pick input{position:absolute;opacity:0}
+.pick span{position:absolute;left:3px;top:2px;background:#000a;color:#fff;font-size:11px;padding:0 5px;border-radius:4px}
+.rp{border:1px solid #bbb;border-radius:10px;padding:8px 12px;margin:10px 0;break-inside:avoid}
+.rp h3{font-size:18px;margin:0}
+.rp .sit{font-size:15px;margin:4px 0 6px}
+.rp table{width:100%;border-collapse:collapse}
+.rp td{padding:4px 6px;border-top:1px dashed #ccc;vertical-align:top;font-size:17px;line-height:1.8}
+.rp td.who{width:74px;font-size:13px;color:#555;white-space:nowrap}
+.rp td.me{background:#eef6ec}
+.rp .en2{display:block;font-size:12px;color:#555;font-family:Arial,Helvetica,sans-serif;line-height:1.4}
+.rp .how{font-size:13px;color:#555;margin:6px 0 0}
+.pick2{display:flex;flex-wrap:wrap;gap:6px 14px;padding:6px}
+.ans{page-break-before:always}
+@media(max-width:700px){.sheet{padding:16px 14px}.sheet .meta{flex-wrap:wrap}.sheet .nm{min-width:140px}.two{grid-template-columns:minmax(0,1fr)}.thumbs{grid-template-columns:repeat(2,1fr)}.q .blank{min-width:120px}table.tb{font-size:15px}.sheet{overflow-x:auto}}
+.ans.off,.sec.off{display:none}
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff;font-size:15px}
+  main.wide{max-width:none;padding:0}
+  .sheet{border:none;padding:0;margin:0}
+  .noprint,header.top{display:none!important}
+  .sec.off,.ans.off{display:none!important}
+}
+.en{font-size:.62em;font-weight:400;color:#555;margin-left:.5em;font-family:Arial,Helvetica,sans-serif}
+th .en{display:block;margin:0}
+</style>
+</head>
+<body>
+<main class="wide">
+  <h1 class="noprint" style="margin-bottom:2px">復習プリント <span class="pill" id="lname"></span></h1>
+  <p class="sub noprint" style="margin-bottom:10px">授業の最後に生徒へ渡すプリントです。課のデータから、ことば・できること・練習問題・スライド・宿題を自動でまとめます。「PDFにする」で保存して、メールなどで送れます。</p>
+
+  <div class="card ctl noprint">
+    <div class="row">
+      <select id="lsel" style="width:auto"></select>
+      <label style="margin:0">生徒</label><input id="stu" placeholder="名前" style="width:170px">
+      <label style="margin:0">日付</label><input id="dt" type="date" style="width:auto">
+      <label style="margin:0">問題の数</label>
+      <select id="nq" style="width:auto"><option value="3">少なめ</option><option value="5" selected>ふつう</option><option value="8">多め</option></select>
+      <button id="regen">🔀 問題をつくりなおす</button>
+    </div>
+    <div class="row">
+      <label class="chk"><input type="checkbox" data-sec="words" checked>ことば</label>
+      <label class="chk"><input type="checkbox" data-sec="goals" checked>ぶんけい・できること</label>
+      <label class="chk"><input type="checkbox" data-sec="quiz" checked>練習問題</label>
+      <label class="chk"><input type="checkbox" data-sec="rp" checked>ロールプレイ</label>
+      <label class="chk"><input type="checkbox" data-sec="slides" checked>スライドのまとめ</label>
+      <label class="chk"><input type="checkbox" data-sec="hw" checked>しゅくだい・次回</label>
+      <label class="chk"><input type="checkbox" data-sec="ans">答えのページ(先生用)</label>
+    </div>
+    <div class="row">
+      <button class="btn-primary" id="pdf" style="font-size:18px;padding:10px 22px">📄 PDFにする(印刷)</button>
+      <a id="toNext" class="btn" style="padding:8px 14px;border:1px solid var(--line);border-radius:9px;background:#fff">📅 まとめ・次回予告</a>
+      <a id="toLesson" class="btn" style="padding:8px 14px;border:1px solid var(--line);border-radius:9px;background:#fff">授業コンソールへ</a>
+    </div>
+    <p class="sub" style="margin:4px 0 0;font-size:14px">印刷画面の送信先を「PDFに保存」にすると、ファイル名が「復習_生徒名_課_日付」で保存されます。「答えのページ」は、生徒に渡す前にチェックを外してください。</p>
+    <details style="margin-top:8px" id="rpDet"><summary style="cursor:pointer;color:var(--blue)">ロールプレイの場面を選ぶ</summary><div class="pick2" id="rpPick"></div></details>
+    <details style="margin-top:8px"><summary style="cursor:pointer;color:var(--blue)">スライドのまとめに入れるスライドを選ぶ</summary>
+      <div class="pick" id="pick"></div>
+    </details>
+  </div>
+
+  <div class="sheet" id="sheet"></div>
+</main>
+<script src="data/index.js?v=5"></script>
+<script src="data/roleplay.js"></script>
+<script src="js/app.js?v=5"></script>
+<script>
+renderHeader('', '');
+const q = new URLSearchParams(location.search); const N = parseInt(q.get('n'))||1;
+const $ = id=>document.getElementById(id), pad = n=>String(n).padStart(2,'0');
+$('lsel').innerHTML = LESSON_INDEX.map(l=>'<option value="'+l.n+'"'+(l.n===N?' selected':'')+'>'+esc(l.label)+' '+esc(l.title)+'</option>').join('');
+$('lsel').onchange = ()=>location.href='review.html?n='+$('lsel').value;
+$('toNext').href='next.html?n='+N; $('toLesson').href='lesson.html?n='+N;
+const cs = Students.cur(); $('stu').value = store.get('review:stu', cs? cs.name : '');
+$('dt').value = new Date().toISOString().slice(0,10);
+const SKEY='review:set:'+N; const set = store.get(SKEY, {});
+let seed = set.seed || (Date.now() % 100000);
+let secs = set.secs || {words:true,goals:true,quiz:true,rp:true,slides:true,hw:true,ans:false};
+if(secs.rp===undefined) secs.rp=true;
+let rpSel = set.rp || null;
+let picked = set.picked || null;
+if(set.nq) $('nq').value = set.nq;
+function save(){ store.set(SKEY,{seed,secs,picked,rp:rpSel,nq:$('nq').value}); store.set('review:stu',$('stu').value); }
+function rng(s){ return ()=>{ s|=0; s=s+0x6D2B79F5|0; let t=Math.imul(s^s>>>15,1|s); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function shuffle(a,r){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function lines(v){ return (v||'').split('\n').map(x=>x.trim()).filter(Boolean); }
+function getInfo(L,k){ const r=(L.info||[]).find(x=>x[0]===k); return r?r[1]:''; }
+function fmtDate(s){ if(!s) return ''; const d=new Date(s+'T00:00:00'); return d.toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'}); }
+
+let L=null, vocab=[];
+loadLesson(N, data=>{
+  if(!data){ $('sheet').innerHTML='<p>この課のデータが見つかりません。</p>'; return; }
+  L=data;
+  const lab = ((N<100&&N!==26)?'第'+N+'課 '+L.title:L.title);
+  $('lname').textContent = lab;
+  const extra = store.get('vocabExtra:'+N,'');
+  const seen=new Set();
+  vocab = (L.vocab||[]).concat(extra.split('\n').filter(l=>l.trim()).map(l=>{ const [w,m]=l.split('|'); return {w:(w||'').trim(), m:(m||'').trim(), s:0, g:'じぶんの ことば'}; }))
+    .filter(v=>v.w && v.w.length<=24 && !/[→=]/.test(v.w) && !seen.has(v.w) && seen.add(v.w));
+  const slideSet=[...new Set(vocab.map(v=>v.s).filter(s=>s>0))].sort((a,b)=>a-b);
+  if(!picked){ picked = slideSet.length<=9 ? slideSet : Array.from({length:9},(_,i)=>slideSet[Math.round(i*(slideSet.length-1)/8)]); }
+  document.querySelectorAll('[data-sec]').forEach(c=>{ c.checked=!!secs[c.dataset.sec]; c.onchange=()=>{ secs[c.dataset.sec]=c.checked; save(); render(); }; });
+  $('pick').innerHTML = L.slides.map(s=>'<label class="'+(picked.includes(s.n)?'on':'')+'"><input type="checkbox" data-n="'+s.n+'" '+(picked.includes(s.n)?'checked':'')+'><img loading="lazy" src="slides/L'+pad(N)+'/s-'+pad(s.n)+'.jpg"><span>'+s.n+'</span></label>').join('');
+  document.querySelectorAll('#pick input').forEach(c=>c.onchange=()=>{ const n=+c.dataset.n; picked = c.checked? picked.concat(n).sort((a,b)=>a-b) : picked.filter(x=>x!==n); c.parentElement.classList.toggle('on',c.checked); save(); render(); });
+  rpPick(); render();
+  if(q.get('print')==='1') waitPrint();
+});
+['stu','dt'].forEach(id=>$(id).addEventListener('input',()=>{ save(); render(); }));
+$('nq').onchange=()=>{ save(); render(); };
+$('regen').onclick=()=>{ seed=(Date.now()%100000); save(); render(); toast('問題をつくりなおしました'); };
+$('pdf').onclick=()=>doPrint();
+function fname(){ const lab=((N<100&&N!==26)?'第'+N+'課':L.title); return '復習_'+($('stu').value.trim()||'生徒')+'_'+lab+'_'+$('dt').value; }
+function doPrint(){ const t=document.title; document.title=fname(); window.print(); setTimeout(()=>document.title=t,1500); }
+function waitPrint(){ const imgs=[...document.querySelectorAll('#sheet img')]; Promise.all(imgs.map(i=>i.complete?1:new Promise(r=>{i.onload=i.onerror=r;}))).then(()=>setTimeout(doPrint,400)); }
+
+function rpScenes(){
+  const ed=store.get('roleplay2edits',{}), cu=store.get('roleplay2',[]);
+  const b=(window.RP_BANK||[]).map((x,i)=>ed['b'+i]?Object.assign({id:'b'+i},ed['b'+i]):Object.assign({id:'b'+i},x));
+  const c=cu.map((x,i)=>Object.assign({id:'c'+i},x));
+  return b.concat(c).filter(x=>x.n===N);
+}
+function rpHtml(){
+  const all=rpScenes(); if(!all.length) return '';
+  const ids=rpSel||all.map(x=>x.id); const use=all.filter(x=>ids.includes(x.id));
+  if(!use.length) return '';
+  let h='<h2>④ ロールプレイ <span class="en">Role-play</span></h2><p class="sub2">ペアで やくを きめて、せりふを よんで みましょう。つぎに、やくを こうたい します。 <span class="en" style="margin:0;display:inline">Read the dialogue in pairs, then swap roles.</span></p>';
+  h+=use.map((s,i)=>{
+    const rows=s.l.map(l=>'<tr><td class="who">'+l[0]+' '+ruby(l[0]==='A'?s.a:s.b)+(l[0]==='A'?(s.ae?'<span class="en2">'+esc(s.ae)+'</span>':''):(s.be?'<span class="en2">'+esc(s.be)+'</span>':''))+'</td><td'+(l[0]==='B'?' class="me"':'')+'>'+ruby(l[1])+(l[2]?'<span class="en2">'+esc(l[2])+'</span>':'')+'</td></tr>').join('');
+    return '<div class="rp"><h3>'+(i+1)+'. '+ruby(s.t)+(s.te?' <span class="en">'+esc(s.te)+'</span>':'')+'</h3>'+(s.sit?'<div class="sit">'+ruby(s.sit)+(s.site?'<span class="en2">'+esc(s.site)+'</span>':'')+'</div>':'')+'<table>'+rows+'</table>'
+      +'<div class="how">☐ A を やった　☐ B を やった　<span class="en" style="margin:0">Played A / Played B</span></div></div>';
+  }).join('');
+  return h;
+}
+function rpPick(){
+  const all=rpScenes(); const det=$('rpDet');
+  if(!all.length){ det.style.display='none'; return; } det.style.display='';
+  const ids=rpSel||all.map(x=>x.id);
+  $('rpPick').innerHTML=all.map(x=>'<label class="chk" style="margin:0"><input type="checkbox" data-rp="'+x.id+'" '+(ids.includes(x.id)?'checked':'')+'> '+ruby(x.t)+'</label>').join('');
+  document.querySelectorAll('#rpPick input').forEach(c=>c.onchange=()=>{ const cur=rpSel||all.map(x=>x.id); rpSel=c.checked? [...new Set(cur.concat(c.dataset.rp))] : cur.filter(x=>x!==c.dataset.rp); save(); render(); });
+}
+function render(){
+  if(!L) return;
+  const nq=+$('nq').value, r=rng(seed+N*7);
+  const lab = ((N<100&&N!==26)?'第'+N+'課 '+L.title:L.title);
+  const name=$('stu').value.trim();
+  const sec=(k,html)=>'<div class="sec'+(secs[k]?'':' off')+'">'+html+'</div>';
+  let h='<div class="meta"><div><h1>復習プリント <span class="en">Review Sheet</span></h1><div style="font-size:19px;margin-top:2px">'+esc(lab)+'</div></div><div style="text-align:right"><div style="font-size:15px;color:var(--muted)">'+esc(fmtDate($('dt').value))+'</div><div style="margin-top:4px">なまえ Name <span class="nm">'+esc(name)+'&nbsp;</span></div></div></div>';
+
+  /* ことば */
+  let w='<h2>① 今日の ことば <span class="en">Today\'s Words</span></h2>';
+  if(vocab.length){
+    const tb=arr=>'<table class="tb"><tr><th class="ck">☑</th><th>ことば<span class="en">Word</span></th><th>いみ・ヒント<span class="en">Meaning / Hint</span></th></tr>'+arr.map(v=>'<tr><td class="ck">☐</td><td>'+esc(v.w)+'</td><td>'+esc(v.m||'')+'</td></tr>').join('')+'</table>';
+    w+='<p class="sub2">声に出して よみましょう。言えたら ☑ を つけます。</p>';
+    if(vocab.length>20){ const hf=Math.ceil(vocab.length/2); w+='<div class="two">'+tb(vocab.slice(0,hf))+tb(vocab.slice(hf))+'</div>'; } else w+=tb(vocab);
+  } else w+='<p class="sub2">この課には ことばの データが ありません。</p>';
+  h+=sec('words',w);
+
+  /* ぶんけい・できること */
+  const pats=getInfo(L,'文型').split(/[／\n]/).map(x=>x.trim()).filter(Boolean);
+  const goals=getInfo(L,'到達目標').split('\n').map(x=>x.replace(/^[①-⑩]\s*/,'').trim()).filter(Boolean);
+  const done=store.get('candoDone:'+N,[]);
+  let g='<h2>② ぶんけい と できること <span class="en">Sentence Patterns &amp; Can-do</span></h2>';
+  if(pats.length) g+='<table class="tb">'+pats.map(p=>'<tr><td>'+esc(p)+'</td></tr>').join('')+'</table>';
+  if(goals.length) g+='<p class="sub2" style="margin-top:10px">できるように なったことに ✔ を つけましょう。(先生が ✔ を つけた ものは、はじめから ✔ です)</p>'+goals.map((x,i)=>'<div class="goal"><span class="bx">'+(done.includes(i)?'✔':'')+'</span><span>'+esc(x)+'</span></div>').join('');
+  h+=sec('goals',g);
+
+  /* 練習問題 */
+  const good=v=>!/^[0-9×〜~]/.test(v.w) && !/[0-9]+(さい|かい|まい|にん)$/.test(v.w);
+  const withM=vocab.filter(v=>v.m && v.m.length<=40 && good(v));
+  const A=shuffle(withM,r).slice(0,nq);
+  const rest=withM.filter(v=>!A.includes(v));
+  const B=shuffle(rest.length>=nq?rest:withM,r).slice(0,nq);
+  const C=shuffle(vocab.filter(good),r).slice(0,nq);
+  const D=pats.slice(0,Math.max(2,Math.min(pats.length,Math.ceil(nq/2))));
+  let k=0, qs='<h2>③ れんしゅう もんだい <span class="en">Practice Questions</span></h2>', ans='';
+  if(A.length){ qs+='<h3 style="font-size:17px;margin:8px 0 2px">問題1　ことばの いみ・ヒントを かきましょう。 <span class="en">Q1 Write the meaning or hint.</span></h3>'+A.map((v,i)=>'<div class="q"><span class="no">'+(i+1)+'</span><span>'+esc(v.w)+'　→　<span class="blank"></span></span></div>').join(''); ans+='<h3>問題1 Q1</h3>'+A.map((v,i)=>'<div>'+(i+1)+'. '+esc(v.w)+' → '+esc(v.m)+'</div>').join(''); }
+  if(B.length>=2){ const bank=shuffle(B,r); qs+='<h3 style="font-size:17px;margin:14px 0 2px">問題2　いみ・ヒントに あう ことばを から えらんで かきましょう。 <span class="en">Q2 Choose the matching word from the box.</span></h3><div class="bank">'+bank.map(v=>'<span>'+esc(v.w)+'</span>').join('')+'</div>'+B.map((v,i)=>'<div class="q"><span class="no">'+(i+1)+'</span><span>'+esc(v.m)+'　→　<span class="blank"></span></span></div>').join(''); ans+='<h3 style="margin-top:12px">問題2 Q2</h3>'+B.map((v,i)=>'<div>'+(i+1)+'. '+esc(v.m)+' → '+esc(v.w)+'</div>').join(''); }
+  if(C.length){ qs+='<h3 style="font-size:17px;margin:14px 0 2px">問題3　ことばを よんで、ノートに 2かい かきましょう。 <span class="en">Q3 Read the words and write each twice in your notebook.</span></h3><div class="bank">'+C.map(v=>'<span>'+esc(v.w)+'</span>').join('')+'</div>'; }
+  if(D.length){ qs+='<h3 style="font-size:17px;margin:14px 0 2px">問題4　つぎの ぶんけいで、じぶんの ぶんを つくりましょう。 <span class="en">Q4 Make your own sentence with each pattern.</span></h3>'+D.map((p,i)=>'<div class="q"><span class="no">'+(i+1)+'</span><span>'+esc(p)+'<span class="wide"></span><span class="wide"></span></span></div>').join(''); }
+  if(!A.length&&!B.length&&!C.length&&!D.length) qs+='<p class="sub2">この課では 自動の もんだいを つくれませんでした。</p>';
+  qs+='<h3 style="font-size:17px;margin:14px 0 2px">ふりかえり <span class="en">Reflection</span></h3><div class="goal">きょうの じゅぎょうは どうでしたか。　☆ ☆ ☆　(むずかしかった ところ: <span class="blank" style="min-width:260px"></span>)</div>';
+  h+=sec('quiz',qs);
+
+  /* ロールプレイ */
+  { const rh=rpHtml(); if(rh) h+=sec('rp',rh); }
+
+  /* スライド */
+  let sl='<h2>⑤ きょうの スライド <span class="en">Today\'s Slides</span></h2>';
+  sl+= picked.length ? '<div class="thumbs">'+picked.map(n=>{ const s=L.slides[n-1]||{}; return '<figure><img src="slides/L'+pad(N)+'/s-'+pad(n)+'.jpg"><figcaption>'+n+(s.tag?'　'+esc(s.tag):'')+'</figcaption></figure>'; }).join('')+'</div>' : '<p class="sub2">スライドが えらばれていません。(上の「スライドのまとめに入れる…」から えらべます)</p>';
+  h+=sec('slides',sl);
+
+  /* しゅくだい・次回 */
+  const nx=store.get('nextpage:'+N,{});
+  const hw=lines(nx.hw).length?lines(nx.hw):(L.homework||[]);
+  let hh='<h2>⑥ しゅくだい <span class="en">Homework</span></h2>'+(hw.length?hw.map(x=>'<div class="hw"><span>☐</span><span>'+esc(x)+'</span></div>').join(''):'<div class="hw">なし None</div>');
+  if(nx.msg) hh+='<div class="nx"><b>せんせいから <span class="en">From your teacher</span></b><br>'+esc(nx.msg).replace(/\n/g,'<br>')+'</div>';
+  const NEXT=N===101?102:N===102?1:N+1, nl=LESSON_INDEX.find(l=>l.n===NEXT);
+  if(nl) hh+='<div class="nx"><b>つぎは <span class="en">Next</span></b>　'+esc(nl.label+' '+nl.title)+(nx.when?'　'+esc(new Date(nx.when).toLocaleString('ja-JP',{month:'long',day:'numeric',weekday:'short',hour:'2-digit',minute:'2-digit'})):'')+'</div>';
+  h+=sec('hw',hh);
+
+  /* 答え */
+  h+='<div class="ans'+(secs.ans?'':' off')+'"><h1 style="font-size:22px">答え(先生用) <span class="en">Answers (teacher)</span>　'+esc(lab)+'</h1>'+(ans||'<p>じぶんで つくる もんだいです。</p>')+'</div>';
+  $('sheet').innerHTML=h;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ロールプレイ | いろどり 日本語クラス</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+.lcard{display:flex;gap:8px;align-items:center;padding:7px 4px;border-bottom:1px dashed var(--line);cursor:pointer}
+.lcard:hover{background:var(--accent-soft)}
+.lcard.on{background:var(--accent-soft);font-weight:700}
+.lcard .tag{font-size:12px;color:var(--muted);min-width:44px}
+.lcard .te{font-size:12px;color:var(--muted);font-weight:400}
+#list{max-height:560px;overflow:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:900px){#list{max-height:320px}.lcard{padding:12px 6px}}
+.en{color:#555;font-size:.72em;font-weight:400;font-family:Arial,Helvetica,sans-serif;display:block;margin-top:2px}
+.bubble .jp{font-size:21px;line-height:1.7;display:block}
+.bubble.t{max-width:88%}
+.bubble.s{max-width:88%}
+.hide-en .en{display:none}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ctl label{margin:0;display:flex;gap:4px;align-items:center;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+  <h1>ロールプレイ <span class="pill">Role-play</span></h1>
+  <p class="sub">場面を選び、先生と生徒で役を決めて会話します。「🖥 生徒画面を開く」で、画面共有する生徒用の画面を別ウィンドウに出せます。</p>
+
+  <div class="grid g2">
+    <section class="card">
+      <div class="row" style="justify-content:space-between;align-items:end">
+        <div style="flex:1"><label>課で しぼる</label><select id="lsel"></select></div>
+        <button id="rand">🎲 ランダム</button>
+      </div>
+      <div id="count" class="sub" style="margin:6px 0"></div>
+      <div id="list"></div>
+      <div class="row" style="margin-top:10px"><button id="add">＋ 場面を追加</button></div>
+    </section>
+
+    <section class="card" id="play">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <h2 id="sTitle" style="margin:0"></h2>
+          <div class="en" id="sTitleEn" style="margin:0"></div>
+        </div>
+        <button id="swap">🔄 役を交代</button>
+      </div>
+      <p id="sSituation" style="margin:8px 0 2px"></p>
+      <p class="en" id="sSituationEn" style="margin:0 0 8px"></p>
+      <div class="row">
+        <span class="pill" id="roleT"></span><span class="pill" id="roleS" style="background:#eef6ec;color:var(--green)"></span>
+      </div>
+      <div id="script" style="margin:12px 0"></div>
+      <div class="ctl">
+        <button id="prev">◀ 前へ</button>
+        <button id="more" class="btn-primary">次のせりふ ▶</button>
+        <button id="all">全部見る</button>
+        <button id="reset">最初から</button>
+      </div>
+      <div class="ctl" style="margin-top:10px">
+        <label><input type="checkbox" id="hideS"> 生徒の せりふを かくす(自分で 言う)</label>
+        <label><input type="checkbox" id="showEn" checked> English</label>
+        <label><input type="checkbox" id="showRuby" checked> ふりがな</label>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button id="openPresent" class="btn-primary">🖥 生徒画面を開く</button>
+        <button id="nextScene">次の場面 ▶▶</button>
+      </div>
+      <p class="sub" style="margin-top:6px">生徒画面は 先生の画面と 同じ内容が 自動で うつります。「生徒の せりふを かくす」を オンに すると、生徒の 番の せりふが ぼかされ、先生が クリックすると 見えます。</p>
+    </section>
+  </div>
+
+  <section class="card noprint" style="margin-top:16px">
+    <h2>場面を編集 <span class="sub" id="eNote" style="font-weight:400"></span></h2>
+    <div class="row">
+      <div style="flex:2;min-width:200px"><label>タイトル</label><input id="eTitle"></div>
+      <div style="flex:2;min-width:200px"><label>Title (English)</label><input id="eTitleEn"></div>
+      <div style="flex:1;min-width:90px"><label>課(0=なし)</label><input id="eN" type="number" min="0" max="102"></div>
+    </div>
+    <div class="row">
+      <div style="flex:1;min-width:130px"><label>Aの役</label><input id="eA"></div>
+      <div style="flex:1;min-width:130px"><label>Bの役</label><input id="eB"></div>
+    </div>
+    <label>場面の説明</label><input id="eSit">
+    <label>Situation (English)</label><input id="eSitEn">
+    <label>台本(1行ずつ「A: せりふ | English」。漢字{かんじ} で ふりがな。English は なくても OK)</label>
+    <textarea id="eScript" style="min-height:140px"></textarea>
+    <div class="row" style="margin-top:10px"><button class="btn-primary" id="eSave">保存</button><button id="eDel">削除</button><span class="sub">※ 内蔵の 場面は 編集すると 自分用の コピーとして 保存されます。</span></div>
+  </section>
+</main>
+<script src="../data/index.js?v=5"></script>
+<script src="../data/roleplay.js"></script>
+<script src="../js/app.js?v=5"></script>
+<script>
+renderHeader('pages/roleplay.html','../');
+const $ = id => document.getElementById(id);
+const BANK = (window.RP_BANK||[]).map((s,i)=>Object.assign({id:'b'+i,builtin:true},s));
+
+/* --- 自分の場面(保存) --- */
+function parseScript(t){
+  return String(t||'').split('\n').map(x=>x.trim()).filter(Boolean).map(l=>{
+    const m = l.match(/^([AB])[:：]\s*(.*)$/); const w = m?m[1]:'A'; const rest = m?m[2]:l;
+    const p = rest.split(/\s*[|｜]\s*/); return [w, p[0]||'', p[1]||''];
+  });
+}
+function toScript(L){ return L.map(l=>l[0]+': '+l[1]+(l[2]?' | '+l[2]:'')).join('\n'); }
+let custom = store.get('roleplay2', null);
+if(custom===null){
+  custom = [];
+  try{ /* 旧版(roleplay)から引きつぎ。初期の2場面は新しい内蔵版に ふくまれるので除く */
+    const old = JSON.parse(localStorage.getItem('ir:roleplay')||'null')||[];
+    old.forEach(o=>{ if(['はじめまして','お店で買い物'].includes(o.title) && /田中|いらっしゃいませ/.test(o.script||'')) return;
+      custom.push({n:0,t:o.title,te:'',sit:o.situation||'',site:'',a:o.a||'先生',ae:'',b:o.b||'生徒',be:'',l:parseScript(o.script)}); });
+  }catch(e){}
+  store.set('roleplay2', custom);
+}
+const edits = store.get('roleplay2edits', {});   /* 内蔵場面の自分用コピー {id: scene} */
+function allScenes(){
+  const c = custom.map((s,i)=>Object.assign({id:'c'+i,builtin:false},s));
+  return BANK.map(s=>edits[s.id]?Object.assign({id:s.id,builtin:true,edited:true},edits[s.id]):s).concat(c);
+}
+
+/* --- 状態 --- */
+let fN = store.get('rpFilter', ''), curId = store.get('rpCur', null);
+let shown = 1, swapped = false, hideS = false, showEn = true, showRuby = true;
+function filtered(){ const a = allScenes(); return fN===''? a : a.filter(s=>String(s.n)===String(fN)); }
+function curScene(){ const f = filtered(); return f.find(s=>s.id===curId) || f[0] || null; }
+function lessonLabel(n){ if(!n) return '自分の'; const l = (window.LESSON_INDEX||[]).find(x=>x.n===n); return l? l.label : '第'+n+'課'; }
+
+/* 先生側の役 = swapped ? B : A */
+function teacherW(){ return swapped ? 'B' : 'A'; }
+
+/* 台本の html (先生画面・生徒画面で共通) */
+function scriptHtml(s, interactive){
+  const tw = teacherW();
+  return s.l.map((l,i)=>{
+    const isT = l[0]===tw, vis = i < shown;
+    const hid = hideS && !isT && i===shown-1 ? 'hidden-ans' : (hideS && !isT ? 'hidden-ans' : '');
+    const role = l[0]==='A'? s.a : s.b;
+    return '<div class="bubble '+(isT?'t':'s')+'" style="'+(vis?'':'display:none')+'"><b>'+(isT?'先生':'あなた')+' ('+ruby(role)+')</b>'
+      + '<span class="jp '+hid+'" '+(interactive?'data-reveal':'')+'>'+ruby(l[1])+'</span>'
+      + (l[2]?'<span class="en">'+esc(l[2])+'</span>':'')+'</div>';
+  }).join('');
+}
+function headHtml(s){
+  const tw = teacherW();
+  const ta = tw==='A'?s.a:s.b, sa = tw==='A'?s.b:s.a;
+  return {ta,sa};
+}
+
+function drawList(){
+  const f = filtered(), c = curScene();
+  $('count').textContent = f.length+' 場面';
+  $('list').innerHTML = f.map(s=>'<div class="lcard '+(c&&c.id===s.id?'on':'')+'" data-id="'+s.id+'"><span class="tag">'+esc(lessonLabel(s.n))+'</span><span>'+ruby(s.t)+(s.te?'<span class="te"> '+esc(s.te)+'</span>':'')+'</span></div>').join('') || '<p class="sub">場面が ありません</p>';
+  document.querySelectorAll('#list [data-id]').forEach(e=>e.onclick=()=>{ curId=e.dataset.id; store.set('rpCur',curId); shown=1; draw(); });
+}
+function draw(){
+  drawList();
+  const s = curScene();
+  if(!s){ $('play').style.display='none'; return; } $('play').style.display='block';
+  curId = s.id;
+  document.body.classList.toggle('hide-ruby', !showRuby);
+  $('play').classList.toggle('hide-en', !showEn);
+  $('sTitle').innerHTML = ruby(s.t); $('sTitleEn').textContent = s.te||'';
+  $('sSituation').innerHTML = ruby(s.sit); $('sSituationEn').textContent = s.site||'';
+  const h = headHtml(s);
+  $('roleT').innerHTML = '先生: '+ruby(h.ta)+(s.ae||s.be? ' / '+esc((swapped?s.be:s.ae)||''):'');
+  $('roleS').innerHTML = '生徒: '+ruby(h.sa)+(s.ae||s.be? ' / '+esc((swapped?s.ae:s.be)||''):'');
+  $('script').innerHTML = scriptHtml(s,true);
+  document.querySelectorAll('[data-reveal]').forEach(e=>e.onclick=()=>{ e.classList.remove('hidden-ans'); sendQ(); });
+  /* 編集欄 */
+  $('eTitle').value=s.t; $('eTitleEn').value=s.te||''; $('eN').value=s.n||0; $('eA').value=s.a; $('eB').value=s.b;
+  $('eSit').value=s.sit; $('eSitEn').value=s.site||''; $('eScript').value=toScript(s.l);
+  $('eNote').textContent = s.builtin? (s.edited?'(内蔵を編集した コピー)':'(内蔵の 場面)') : '(自分の 場面)';
+  snapshot();
+}
+
+/* --- 生徒画面へ同期 --- */
+const ch = ('BroadcastChannel' in window) ? new BroadcastChannel('ir-roleplay') : null;
+let last = null;
+function snapshot(){
+  const s = curScene(); if(!s){ last={type:'rp',html:'',hideRuby:!showRuby}; sendQ(); return; }
+  const h = headHtml(s);
+  const html = '<div class="rtitle">'+ruby(s.t)+'</div>'+(showEn&&s.te?'<div class="en">'+esc(s.te)+'</div>':'')
+    +'<div class="rsit">'+ruby(s.sit)+'</div>'+(showEn&&s.site?'<div class="en">'+esc(s.site)+'</div>':'')
+    +'<div class="rroles"><span class="pill">先生: '+ruby(h.ta)+'</span><span class="pill me">あなた: '+ruby(h.sa)+'</span></div>'
+    +'<div class="'+(showEn?'':'hide-en')+'">'+scriptHtml(s,false)+'</div>';
+  last = {type:'rp', html, hideRuby:!showRuby};
+  /* 生徒画面は ぼかしを クリックで消せないので、先生が消した状態を そのまま うつす */
+  sendQ();
+}
+let qT=null; function sendQ(){ clearTimeout(qT); qT=setTimeout(()=>{ if(!last) return; /* 先生画面で ぼかしを消した所を反映 */
+  const tmp=document.createElement('div'); tmp.innerHTML = last.html;
+  const live = document.querySelectorAll('#script .jp'); const dst = tmp.querySelectorAll('.jp');
+  live.forEach((e,i)=>{ if(dst[i]) dst[i].classList.toggle('hidden-ans', e.classList.contains('hidden-ans')); });
+  const m = Object.assign({},last,{html:tmp.innerHTML});
+  if(ch) ch.postMessage(m); try{ localStorage.setItem('ir:rpsync', JSON.stringify(Object.assign({t:Date.now()},m))); }catch(_){}
+},40); }
+if(ch) ch.onmessage = e => { if(e.data && e.data.type==='hello') sendQ(); };
+window.addEventListener('storage', e => { if(e.key==='ir:rphello') sendQ(); });
+
+/* --- 操作 --- */
+function len(){ const s=curScene(); return s? s.l.length : 0; }
+$('more').onclick = ()=>{ shown = Math.min(shown+1, len()); draw(); };
+$('prev').onclick = ()=>{ shown = Math.max(1, shown-1); draw(); };
+$('all').onclick = ()=>{ shown = len(); draw(); };
+$('reset').onclick = ()=>{ shown = 1; draw(); };
+$('swap').onclick = ()=>{ swapped=!swapped; draw(); };
+$('hideS').onchange = e=>{ hideS=e.target.checked; draw(); };
+$('showEn').onchange = e=>{ showEn=e.target.checked; draw(); };
+$('showRuby').onchange = e=>{ showRuby=e.target.checked; draw(); };
+$('nextScene').onclick = ()=>{ const f=filtered(); const i=f.findIndex(s=>s.id===curId); curId=f[(i+1)%f.length].id; store.set('rpCur',curId); shown=1; draw(); };
+$('rand').onclick = ()=>{ const f=filtered(); if(!f.length) return; curId=f[Math.floor(Math.random()*f.length)].id; store.set('rpCur',curId); shown=1; draw(); };
+$('openPresent').onclick = ()=>{ window.open('roleplay-present.html','ir_rp_present','width=1100,height=800'); setTimeout(sendQ,800); };
+
+/* 課の しぼりこみ */
+(function(){
+  const nums = [...new Set(allScenes().map(s=>s.n))].sort((a,b)=>a-b);
+  $('lsel').innerHTML = '<option value="">すべて</option>'+nums.map(n=>'<option value="'+n+'">'+esc(n? lessonLabel(n)+' '+(((window.LESSON_INDEX||[]).find(x=>x.n===n)||{}).title||'') : '自分の 場面')+'</option>').join('');
+  $('lsel').value = String(fN);
+  $('lsel').onchange = e=>{ fN = e.target.value; store.set('rpFilter',fN); shown=1; curId=null; draw(); };
+})();
+
+/* 追加・保存・削除 */
+$('add').onclick = ()=>{
+  custom.push({n:+fN||0,t:'新しい場面',te:'',sit:'',site:'',a:'先生',ae:'Teacher',b:'生徒',be:'Student',l:[['A','',''],['B','','']]});
+  store.set('roleplay2',custom); curId='c'+(custom.length-1); shown=1; draw();
+  document.getElementById('eTitle').focus(); toast('下の「場面を編集」で 書いてください');
+};
+$('eSave').onclick = ()=>{
+  const s = curScene(); if(!s) return;
+  const obj = {n:parseInt($('eN').value)||0,t:$('eTitle').value,te:$('eTitleEn').value,sit:$('eSit').value,site:$('eSitEn').value,a:$('eA').value,ae:(s.ae||''),b:$('eB').value,be:(s.be||''),l:parseScript($('eScript').value)};
+  if(s.builtin){ edits[s.id]=obj; store.set('roleplay2edits',edits); }
+  else { custom[+s.id.slice(1)] = obj; store.set('roleplay2',custom); }
+  draw(); toast('保存しました');
+};
+$('eDel').onclick = ()=>{
+  const s = curScene(); if(!s) return;
+  if(s.builtin){ if(s.edited && confirm('自分用の 編集を もとに もどしますか?')){ delete edits[s.id]; store.set('roleplay2edits',edits); draw(); } else if(!s.edited) toast('内蔵の 場面は 削除できません(編集で 自分用の コピーを つくれます)'); return; }
+  if(!confirm('削除しますか?')) return;
+  custom.splice(+s.id.slice(1),1); store.set('roleplay2',custom); curId=null; draw();
+};
+
+/* 初期の課: 前回の課 */
+if(fN==='' ){ const ll = parseInt(localStorage.getItem('ir:lastLesson')||'0'); /* 自動では しぼらない */ }
+draw();
+</script>
+</body>
+</html>

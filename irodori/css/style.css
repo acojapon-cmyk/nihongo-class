@@ -1,0 +1,143 @@
+:root{
+  --bg:#faf7f2; --card:#fff; --ink:#2b2a28; --muted:#7a766f; --line:#e6e0d6;
+  --accent:#c8402f; --accent-soft:#fbe9e5; --blue:#2f6f8f; --green:#3f7d4e; --amber:#b9801a;
+  --radius:14px; --shadow:0 2px 10px rgba(60,40,20,.08);
+  font-family:"Hiragino Sans","Yu Gothic UI","Meiryo",sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.7;font-size:17px}
+a{color:inherit;text-decoration:none}
+header.top{display:flex;align-items:center;gap:16px;padding:12px 24px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+header.top .logo{font-weight:700;font-size:20px;color:var(--accent)}
+header.top nav{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+header.top nav a{padding:6px 14px;border-radius:999px;font-size:15px;color:var(--muted)}
+header.top nav a:hover,header.top nav a.on{background:var(--accent-soft);color:var(--accent)}
+main{max-width:1100px;margin:0 auto;padding:24px}
+h1{font-size:26px;margin:0 0 4px} h2{font-size:20px;margin:0 0 10px} h3{font-size:17px;margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}
+.tile{display:block;transition:.15s}
+.tile:hover{transform:translateY(-2px);border-color:var(--accent)}
+.tile .ic{font-size:30px}
+.tile p{margin:4px 0 0;color:var(--muted);font-size:15px}
+label{display:block;font-size:14px;color:var(--muted);margin:10px 0 4px}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fff}
+textarea{min-height:80px;resize:vertical}
+button,.btn{font:inherit;cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 16px}
+button:hover{border-color:var(--accent)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{filter:brightness(1.08)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:13px}
+/* timeline */
+.timer{font-size:56px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:2px}
+.bar{height:14px;border-radius:7px;background:#eee;overflow:hidden;display:flex}
+.bar span{height:100%;transition:opacity .3s;opacity:.35}
+.bar span.now{opacity:1}
+.phase{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:10px;border:1px solid transparent;cursor:pointer}
+.phase.now{background:var(--accent-soft);border-color:var(--accent)}
+.phase .t{min-width:62px;font-weight:700;color:var(--muted)}
+.phase .dot{width:12px;height:12px;border-radius:50%;margin-top:9px;flex:none}
+.phase small{color:var(--muted)}
+.check{display:flex;gap:10px;align-items:flex-start;padding:5px 0}
+.check input{width:auto;margin-top:7px}
+.check.done span{text-decoration:line-through;color:var(--muted)}
+/* stage (big display for screen share) */
+.stage{background:#fff;border:2px solid var(--ink);border-radius:18px;padding:36px;text-align:center;min-height:240px;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.stage .big{font-size:44px;font-weight:700;line-height:1.5}
+.stage .mid{font-size:26px}
+.stage .small{color:var(--muted)}
+.hidden-ans{filter:blur(10px);cursor:pointer;user-select:none}
+.big-on .stage .big{font-size:60px}
+rt{font-size:.5em}
+.hide-ruby rt{display:none}
+.bubble{padding:10px 14px;border-radius:14px;margin:8px 0;max-width:85%}
+.bubble.t{background:#e8f1f6;border:1px solid #c8dde8}
+.bubble.s{background:#eef6ec;border:1px solid #cfe3cb;margin-left:auto}
+.bubble b{font-size:13px;color:var(--muted);display:block}
+.list-item{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
+.list-item span{flex:1}
+.small-btn{padding:3px 10px;font-size:13px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 18px;border-radius:999px;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1}
+@media print{header.top,button,.noprint{display:none!important}body{background:#fff}.card{box-shadow:none}}
+/* クイズ・文字表 */
+.qopts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.qo{font-size:26px;padding:16px 10px;border-radius:14px;border:2px solid var(--line);background:#fff;cursor:pointer}
+.qo:hover{border-color:var(--accent)}
+.qo.good{background:#e3f4e6;border-color:var(--green)}
+.qo.bad{background:#fde5e1;border-color:var(--accent)}
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px}
+.kc{font-size:30px;padding:10px 4px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;line-height:1.2;font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif}
+.kc small{display:block;font-family:inherit;font-size:11px;color:var(--muted)}
+.kc:hover{border-color:var(--accent)}
+.kc.on{background:var(--accent);color:#fff;border-color:var(--accent)} .kc.on small{color:#fff}
+.chart td{padding:3px} .chart .kc{width:100%;min-width:56px}
+.chart th{font-size:12px;color:var(--muted);font-weight:400;text-align:right;padding-right:8px;white-space:nowrap}
+.wd{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);font-size:24px}
+.wd .m{color:var(--muted);font-size:15px;margin-left:auto}
+.wd mark{background:#ffe08a;border-radius:4px;padding:0 2px}
+.tab{padding:8px 18px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.bigch{font-size:150px;line-height:1.1;font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;text-align:center}
+.kpic{width:110px;height:110px;object-fit:contain}
+.chip{padding:4px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:14px}
+.chip.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* ===== スマホ・タブレット(iPad)対応 ===== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+button,.btn,.tab,.chip,select,summary,a.tile{touch-action:manipulation;-webkit-tap-highlight-color:rgba(200,64,47,.15)}
+img{max-width:100%}
+table{max-width:100%}
+.card{overflow-wrap:anywhere}
+/* タッチ端末: ホバー演出を無効化し、指で押しやすい大きさに */
+@media (hover:none) and (pointer:coarse){
+  .tile:hover,.lc:hover{transform:none}
+  button,.btn,.tab,select{min-height:44px}
+  .small-btn{min-height:36px;padding:4px 12px}
+  .chip{min-height:38px;padding:6px 14px}
+  .check input,.chk input{width:22px;height:22px}
+  input,select,textarea{font-size:16px} /* iOSの自動ズーム防止 */
+  kbd,.kbdhint{display:none} /* キーボード操作の案内はタッチ端末では非表示 */
+  .strip{-webkit-overflow-scrolling:touch}
+}
+/* iPad縦・小さめタブレット以下 */
+@media (max-width:900px){
+  header.top{position:static;padding:10px 14px;gap:8px 12px;flex-wrap:wrap}
+  header.top .logo{font-size:18px}
+  header.top nav{margin-left:0;flex-wrap:nowrap;overflow-x:auto;width:100%;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  header.top nav a{white-space:nowrap;padding:8px 14px}
+  main{padding:16px 14px}
+  table.cd th{top:0!important}
+}
+/* スマホ */
+@media (max-width:600px){
+  body{font-size:16px}
+  h1{font-size:22px} h2{font-size:18px}
+  main{padding:12px 10px}
+  .card{padding:14px 14px}
+  .timer{font-size:44px}
+  .stage{padding:20px 14px;min-height:160px;border-radius:14px}
+  .stage .big{font-size:32px} .stage .mid{font-size:20px}
+  .big-on .stage .big{font-size:38px}
+  .qopts{grid-template-columns:1fr}
+  .qo{font-size:22px;padding:14px 10px}
+  .bigch{font-size:104px}
+  .kgrid{grid-template-columns:repeat(auto-fill,minmax(54px,1fr))}
+  .kc{font-size:26px}
+  .wd{font-size:20px;flex-wrap:wrap}
+  .bubble{max-width:94%}
+  .phase .t{min-width:56px}
+  .row>button,.row>.btn{flex:0 1 auto}
+  .toast{max-width:90vw;text-align:center}
+}
+/* ノッチ・ホームバー(iPhone/iPad)の余白 */
+@supports(padding:max(0px)){
+  body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom)}
+}
+.scrollx{overflow-x:auto;-webkit-overflow-scrolling:touch}
+#tbl,.plan{overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:700px){.plan table{font-size:14px}.notes{font-size:16px!important}}

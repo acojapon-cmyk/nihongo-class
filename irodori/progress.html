@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>生徒・進捗 | いろどり 日本語クラス</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+table.pg{width:100%;border-collapse:collapse;font-size:15px}
+table.pg th,table.pg td{border-bottom:1px solid var(--line);padding:6px 6px;text-align:left;vertical-align:middle}
+table.pg th{background:#f4efe6;position:sticky;top:57px}
+table.pg select,table.pg input{padding:5px 6px;font-size:14px}
+@media(max-width:900px){table.pg{min-width:640px}table.pg th{top:0}}
+tr.done td{background:#f1f8f1} tr.review td{background:#fff6e0}
+.sbar{height:12px;border-radius:6px;background:#eee;overflow:hidden;display:flex}
+.sbar i{display:block;height:100%}
+</style>
+</head>
+<body>
+<main>
+  <h1>生徒・進捗</h1>
+  <p class="sub">生徒ごとに、第1〜25課と「その他」の授業・宿題・メモを記録します。データはこのブラウザに保存されます(下のバックアップで書き出せます)。</p>
+
+  <section class="card" style="margin-bottom:16px">
+    <div class="row">
+      <label style="margin:0">生徒</label><select id="ssel" style="width:auto;min-width:160px"></select>
+      <input id="newName" placeholder="新しい生徒の名前" style="width:200px"><button id="addS" class="btn-primary">追加</button>
+      <button id="renS">名前を変更</button><button id="delS">削除</button>
+    </div>
+    <div style="margin-top:12px">
+      <div class="row" style="justify-content:space-between"><b id="sum"></b><span class="sub" id="next" style="margin:0"></span></div>
+      <div class="sbar" id="sbar"></div>
+    </div>
+  </section>
+
+  <section class="card" id="tbl"></section>
+
+  <section class="card noprint" style="margin-top:16px">
+    <h2>バックアップ</h2>
+    <div class="row">
+      <button id="expJson">JSONで書き出す</button>
+      <button id="expCsv">CSVで書き出す(表計算用)</button>
+      <label class="btn" style="margin:0;cursor:pointer">JSONを読み込む<input type="file" id="impJson" accept=".json" style="display:none"></label>
+    </div>
+  </section>
+</main>
+<script src="data/index.js?v=5"></script>
+<script src="js/app.js?v=5"></script>
+<script>
+renderHeader('progress.html','');
+const $ = id=>document.getElementById(id);
+const STAT = ['','授業済','要復習'], HW = ['','出した','提出済','未提出'];
+function drawSel(){
+  const a = Students.all(), c = Students.cur();
+  $('ssel').innerHTML = a.map(s=>'<option value="'+s.id+'"'+(c&&c.id===s.id?' selected':'')+'>'+esc(s.name)+'</option>').join('') || '<option>(生徒を追加してください)</option>';
+}
+function draw(){
+  drawSel(); const s = Students.cur();
+  if(!s){ $('tbl').innerHTML='<p class="sub">まず生徒の名前を追加してください。</p>'; $('sum').textContent=''; $('sbar').innerHTML=''; $('next').textContent=''; return; }
+  let done=0, rev=0, nextN=null;
+  const rows = LESSON_INDEX.map(l=>{
+    const r = Students.rec(s.id, l.n);
+    if(r.status==='授業済') done++; else if(r.status==='要復習') rev++;
+    if(!nextN && r.status!=='授業済') nextN = l.n;
+    return '<tr class="'+(r.status==='授業済'?'done':r.status==='要復習'?'review':'')+'"><td><b>'+esc(l.label)+'</b></td><td>'+esc(l.title)+'</td>'+
+      '<td><select data-k="status" data-n="'+l.n+'">'+STAT.map(x=>'<option'+(x===r.status?' selected':'')+' value="'+x+'">'+(x||'—')+'</option>').join('')+'</select></td>'+
+      '<td><select data-k="hw" data-n="'+l.n+'">'+HW.map(x=>'<option'+(x===r.hw?' selected':'')+' value="'+x+'">'+(x||'—')+'</option>').join('')+'</select></td>'+
+      '<td><input type="date" data-k="date" data-n="'+l.n+'" value="'+esc(r.date)+'"></td>'+
+      '<td style="width:34%"><input data-k="note" data-n="'+l.n+'" value="'+esc(r.note)+'" placeholder="できたこと・つまずき" style="width:100%"></td>'+
+      '<td class="noprint"><a href="lesson.html?n='+l.n+'" style="color:var(--blue)">授業</a> ・ <a href="next.html?n='+l.n+'" style="color:var(--blue)">予告</a> ・ <a href="vocab.html?n='+l.n+'" style="color:var(--blue)">語彙</a> ・ <a href="review.html?n='+l.n+'" style="color:var(--blue)">復習</a></td></tr>';
+  }).join('');
+  $('tbl').innerHTML = '<table class="pg"><tr><th>課</th><th>テーマ</th><th>状態</th><th>宿題</th><th>日付</th><th>メモ</th><th class="noprint"></th></tr>'+rows+'</table>';
+  const t = LESSON_INDEX.length;
+  $('sum').textContent = esc(s.name)+' さん: '+done+' / '+t+' 完了' + (rev?'(要復習 '+rev+')':'');
+  $('sbar').innerHTML = '<i style="width:'+done/t*100+'%;background:var(--green)"></i><i style="width:'+rev/t*100+'%;background:var(--amber)"></i>';
+  $('next').innerHTML = nextN ? '次の授業: <a href="lesson.html?n='+nextN+'" style="color:var(--accent);font-weight:700">'+esc(LESSON_INDEX.find(l=>l.n===nextN).label)+' '+esc(LESSON_INDEX.find(l=>l.n===nextN).title)+' →</a>' : '全課完了です';
+  document.querySelectorAll('#tbl [data-k]').forEach(el=>{
+    const ev = el.tagName==='INPUT' && el.type!=='date' ? 'change' : 'change';
+    el.addEventListener(ev, ()=>{ Students.setRec(s.id, +el.dataset.n, {[el.dataset.k]: el.value}); if(el.dataset.k==='status'||el.dataset.k==='hw') { if(el.dataset.k==='status' && el.value==='授業済' && !Students.rec(s.id,+el.dataset.n).date){ Students.setRec(s.id,+el.dataset.n,{date:new Date().toISOString().slice(0,10)}); } draw(); } });
+  });
+}
+$('ssel').onchange = ()=>{ Students.setCur($('ssel').value); draw(); };
+$('addS').onclick = ()=>{ const v=$('newName').value.trim(); if(!v) return; Students.add(v); $('newName').value=''; draw(); };
+$('renS').onclick = ()=>{ const s=Students.cur(); if(!s) return; const v=prompt('新しい名前', s.name); if(!v) return; const a=Students.all(); a.find(x=>x.id===s.id).name=v.trim(); store.set('students',a); draw(); };
+$('delS').onclick = ()=>{ const s=Students.cur(); if(!s||!confirm(s.name+' さんの記録をすべて削除しますか?')) return; store.set('students', Students.all().filter(x=>x.id!==s.id)); const p=store.get('prog',{}); delete p[s.id]; store.set('prog',p); store.set('curStudent',null); draw(); };
+function dl(name, text, type){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; a.click(); }
+$('expJson').onclick = ()=>dl('nihongo-progress.json', JSON.stringify({students:Students.all(), prog:store.get('prog',{})}, null, 1), 'application/json');
+$('expCsv').onclick = ()=>{
+  const rows=[['生徒','課','テーマ','授業','宿題','日付','メモ']]; const p=store.get('prog',{});
+  Students.all().forEach(s=>LESSON_INDEX.forEach(l=>{ const r=(p[s.id]||{})[l.n]; if(r&&(r.status||r.hw||r.date||r.note)) rows.push([s.name,l.label,l.title,r.status,r.hw,r.date,r.note]); }));
+  dl('nihongo-progress.csv', '﻿'+rows.map(r=>r.map(c=>'"'+String(c||'').replace(/"/g,'""')+'"').join(',')).join('\n'), 'text/csv');
+};
+$('impJson').onchange = e=>{ const f=e.target.files[0]; if(!f) return; f.text().then(t=>{ try{ const d=JSON.parse(t); if(!Array.isArray(d.students)) throw 0; if(!confirm('現在のデータを置き換えて読み込みますか?')) return; store.set('students', d.students); store.set('prog', d.prog||{}); store.set('curStudent', null); draw(); toast('読み込みました'); }catch(_){ alert('ファイルの形式が違います'); } }); };
+draw();
+</script>
+</body>
+</html>

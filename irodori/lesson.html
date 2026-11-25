@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>授業コンソール | いろどり 日本語クラス</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+main.wide{max-width:1500px;padding:14px 18px}
+.console{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,1fr);gap:16px;align-items:start}
+@media(max-width:1000px){.console{grid-template-columns:minmax(0,1fr)!important}.console>*{min-width:0}}
+.preview{position:relative;background:#000;border-radius:12px;overflow:hidden;aspect-ratio:16/9}
+.preview img{width:100%;height:100%;object-fit:contain;display:block;background:#fff}
+.preview .blk{position:absolute;inset:0;background:#000;color:#888;display:none;align-items:center;justify-content:center}
+.ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.ctl .btn-primary{padding:10px 22px;font-size:18px}
+.live{display:inline-block;width:10px;height:10px;border-radius:50%;background:#bbb;margin-right:4px}
+.live.on{background:#3f7d4e}
+.notes{white-space:pre-wrap;font-size:18px;line-height:1.8;min-height:120px;background:#fffbea;border:1px solid #efe2a8;border-radius:10px;padding:12px 14px}
+.strip{display:flex;gap:6px;overflow-x:auto;padding:8px 2px;margin-top:6px}
+.strip img{width:128px;height:72px;object-fit:cover;border:3px solid transparent;border-radius:6px;cursor:pointer;flex:none;background:#fff}
+.strip img.cur{border-color:var(--accent)}
+.tl{max-height:300px;overflow:auto}
+.tl .phase{padding:7px 10px}
+.tl .phase .t{min-width:78px;font-size:14px}
+.tabs{display:flex;gap:4px;margin:14px 0 8px}
+.tabs button{border-radius:9px 9px 0 0}
+.tabs button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.plan table{border-collapse:collapse;width:100%;margin:8px 0;font-size:15px}
+.plan th,.plan td{border:1px solid var(--line);padding:5px 8px;vertical-align:top}
+.plan th{background:#f4efe6}
+.plan h3{margin-top:18px;border-left:5px solid var(--accent);padding-left:8px}
+.plan h4{margin:12px 0 4px;color:var(--blue)}
+.plan ul{margin:4px 0 8px 18px;padding:0}
+.delta{font-weight:700}
+.delta.late{color:var(--accent)} .delta.ok{color:var(--green)}
+kbd{background:#eee;border:1px solid #ccc;border-radius:4px;padding:0 5px;font-size:13px}
+</style>
+</head>
+<body>
+<main class="wide">
+  <div class="row" style="justify-content:space-between;margin-bottom:8px">
+    <div><h1 id="title" style="margin:0"></h1><div class="sub" id="goal" style="margin:2px 0 0"></div></div>
+    <div class="row">
+      <button id="openPresent" class="btn-primary">🖥 生徒画面を開く</button>
+      <a class="btn" id="aMoji" style="padding:8px 14px;border:1px solid var(--line);border-radius:9px;background:#fff">🔤 文字ページ</a>
+      <a class="btn" id="aVocab" style="padding:8px 14px;border:1px solid var(--line);border-radius:9px;background:#fff">🗂 語彙カード</a>
+      <a class="btn" id="aNext" style="padding:8px 14px;border:1px solid var(--line);border-radius:9px;background:#fff">📅 まとめ・次回予告</a>
+      <a class="btn" id="aBook" target="_blank" rel="noopener" style="padding:8px 14px;border:1px solid var(--line);border-radius:9px;background:#fff">📖 本冊PDF</a>
+      <a class="btn" id="aReview" style="padding:8px 14px;border:1px solid var(--line);border-radius:9px;background:#fff">📘 復習プリント</a>
+      <button id="markDone">✔ 授業済にする</button>
+      <button id="finish" class="btn-primary" title="授業済にして、復習プリントをPDFにする画面を開きます">🎓 授業終了→復習PDF</button>
+      <span class="pill"><span class="live" id="live"></span><span id="liveTxt">生徒画面: 未接続</span></span>
+    </div>
+  </div>
+
+  <div class="console">
+    <div>
+      <div class="preview"><img id="cur" alt=""><div class="blk" id="blk">黒画面(生徒には何も映っていません)</div></div>
+      <div class="ctl">
+        <button id="prev">◀ 前</button>
+        <button id="next" class="btn-primary">次 ▶</button>
+        <span class="pill" id="pos"></span>
+        <button id="blank">⬛ 黒画面 <kbd>B</kbd></button>
+        <button id="mini">🔍 先生用の画面を大きく</button>
+        <span class="sub" style="margin:0 0 0 auto;font-size:13px"><kbd>←</kbd><kbd>→</kbd> <kbd>Space</kbd> で進む ／ <kbd>Home</kbd><kbd>End</kbd></span>
+      </div>
+      <div class="strip" id="strip"></div>
+    </div>
+
+    <div>
+      <section class="card" style="margin-bottom:12px">
+        <div class="row" style="justify-content:space-between">
+          <h3 style="margin:0">先生用ノート <span class="pill" id="tagPill"></span></h3>
+        </div>
+        <div class="notes" id="notes"></div>
+      </section>
+      <section class="card">
+        <div class="row" style="justify-content:space-between;align-items:baseline">
+          <div class="timer" id="clock" style="font-size:38px">00:00</div>
+          <div id="deltaBox" class="small" style="font-size:14px"></div>
+        </div>
+        <div class="row" style="margin:6px 0">
+          <button id="tStart" class="btn-primary">▶ 授業開始</button><button id="tPause">⏸</button><button id="tReset">↺</button>
+        </div>
+        <div class="tl" id="tl"></div>
+      </section>
+      <section class="card" style="margin-top:12px" id="audioCard">
+        <h3 style="margin:0 0 6px">🔊 音声</h3>
+        <div id="audioBox"></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="tabs noprint">
+    <button class="on" data-tab="plan">教案</button>
+    <button data-tab="info">準備物・目標</button>
+  </div>
+  <section class="card plan" id="tabPlan"></section>
+  <section class="card plan" id="tabInfo" style="display:none"></section>
+</main>
+
+<script src="data/index.js?v=5"></script>
+<script src="data/audio.js?v=5"></script>
+<script src="js/app.js?v=5"></script>
+<script src="js/audio.js?v=5"></script>
+<script>
+const q = new URLSearchParams(location.search);
+const N = parseInt(q.get('n')) || 1;
+const pad = n => String(n).padStart(2,'0');
+const sc = document.createElement('script'); sc.src = 'data/L'+pad(N)+'.js'; sc.onload = init; sc.onerror = ()=>{ document.body.innerHTML='<main><p>この課のデータが見つかりません。<a href="index.html">ホームへ</a></p></main>'; };
+document.head.appendChild(sc);
+
+function init(){
+renderHeader('', '');
+const L = window.LESSONS[N]; const total = L.slides.length;
+const $ = id => document.getElementById(id);
+const src = n => 'slides/L'+pad(N)+'/s-'+pad(n)+'.jpg';
+let i = parseInt(q.get('s')) || parseInt(localStorage.getItem('ir:pos:'+N)||'1') || 1;
+$('aVocab').href='vocab.html?n='+N; $('aMoji').href = N===102?'kana.html?s=kata':'kana.html?s=hira'; if(N<100) $('aMoji').style.display='none'; $('aNext').href='next.html?n='+N; $('aReview').href='review.html?n='+N; $('aBook').href='book/book_L'+pad(N)+'.pdf';
+localStorage.setItem('ir:lastLesson', N);
+$('markDone').onclick = ()=>{ const s0=Students.cur(); if(!s0){ toast('先に「生徒・進捗」で生徒を追加してください'); return; } Students.setRec(s0.id, N, {status:'授業済', date:new Date().toISOString().slice(0,10)}); toast(s0.name+' さん: '+(N<100&&N!==26?'第'+N+'課':L.title)+' を授業済にしました'); }; $('finish').onclick = ()=>{ if(Students.cur()) $('markDone').onclick(); location.href='review.html?n='+N+'&print=1'; }; let blank = false; let big = false;
+const LAB = N===26 ? L.title+'(文法・語彙・文化の補足教材)' : N<100 ? '第'+N+'課 '+L.title : L.title+'(文字の授業)';
+document.title = LAB+' | いろどり 日本語クラス';
+$('title').textContent = LAB;
+$('goal').textContent = (L.info.find(r=>r[0]==='文型')||[,''])[1];
+
+/* --- 同期 --- */
+const ch = ('BroadcastChannel' in window) ? new BroadcastChannel('ir-present') : null;
+let lastHeard = 0;
+function send(){ const m = {type:'go', n:N, i, blank}; if(ch) ch.postMessage(m); try{ localStorage.setItem('ir:sync', JSON.stringify(Object.assign({t:Date.now()},m))); }catch(e){} }
+function heard(){ lastHeard = Date.now(); $('live').classList.add('on'); $('liveTxt').textContent = '生徒画面: 接続中'; }
+function onMsg(m){ if(!m || m.n!==N) return; heard(); if(m.type==='hello'){ send(); } else if(m.type==='go'){ i=m.i; blank=!!m.blank; draw(false); } }
+if(ch) ch.onmessage = e => onMsg(e.data);
+window.addEventListener('storage', e => { if(e.key==='ir:sync'){ try{ onMsg(JSON.parse(e.newValue)); }catch(_){} } });
+setInterval(()=>{ if(lastHeard && Date.now()-lastHeard > 30000){ $('live').classList.remove('on'); $('liveTxt').textContent='生徒画面: 未接続'; } },5000);
+
+/* --- 表示 --- */
+function phaseIdx(){ let k=-1; (L.timeline||[]).forEach((t,j)=>{ if(t.from && t.from<=i) k=j; }); return k; }
+function draw(broadcast=true){
+  i = Math.min(Math.max(i,1), total);
+  localStorage.setItem('ir:pos:'+N, i);
+  const s = L.slides[i-1];
+  $('cur').src = src(i); $('blk').style.display = blank?'flex':'none';
+  $('pos').textContent = i+' / '+total;
+  $('tagPill').textContent = s.tag || '';
+  $('notes').textContent = s.notes || '(このスライドにノートはありません)';
+  document.querySelectorAll('.strip img').forEach(el=>el.classList.toggle('cur', +el.dataset.i===i));
+  const cur = document.querySelector('.strip img.cur'); if(cur) cur.scrollIntoView({block:'nearest',inline:'center'});
+  const pk = phaseIdx();
+  document.querySelectorAll('#tl .phase').forEach(el=>el.classList.toggle('now', +el.dataset.k===pk));
+  [i+1,i+2].forEach(k=>{ if(k<=total){ const p=new Image(); p.src=src(k); } });
+  delta();
+  if(broadcast) send();
+}
+$('strip').innerHTML = L.slides.map(s=>'<img loading="lazy" data-i="'+s.n+'" src="'+src(s.n)+'" title="'+s.n+'">').join('');
+document.querySelectorAll('.strip img').forEach(el=>el.onclick=()=>{ i=+el.dataset.i; draw(); });
+$('prev').onclick = ()=>{ i--; draw(); };
+$('next').onclick = ()=>{ i++; draw(); };
+$('blank').onclick = ()=>{ blank=!blank; draw(); };
+$('mini').onclick = ()=>{ big=!big; document.querySelector('.console').style.gridTemplateColumns = big? 'minmax(0,2.2fr) minmax(300px,1fr)' : ''; };
+document.addEventListener('keydown', e=>{
+  if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){ e.preventDefault(); i++; draw(); }
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){ i--; draw(); }
+  else if(e.key==='Home'){ i=1; draw(); } else if(e.key==='End'){ i=total; draw(); }
+  else if(e.key==='b'||e.key==='B'){ blank=!blank; draw(); }
+});
+$('openPresent').onclick = ()=>{ const w = window.open('present.html?n='+N+'&_='+Date.now(), 'ir-present', 'width=1280,height=720'); if(window.AudioPanel) AudioPanel.win = w; if(!w) toast('ポップアップがブロックされました。許可してください'); setTimeout(send, 800); };
+
+/* --- 時間割とタイマー --- */
+const tl = L.timeline||[];
+$('tl').innerHTML = tl.length ? tl.map((t,k)=>'<div class="phase" data-k="'+k+'" data-from="'+(t.from||'')+'"><span class="t">'+esc(t.time)+'</span><div><b>'+esc(t.act)+'</b><br><small>スライド '+esc(t.slides)+(t.form?' ・ '+esc(t.form):'')+'</small></div></div>').join('')
+  : '<p class="sub">この課には時間割の資料がありません(第11課は教案なし)。スライド下のノートを参照してください。</p>';
+document.querySelectorAll('#tl .phase').forEach(el=>el.onclick=()=>{ const f=+el.dataset.from; if(f){ i=f; draw(); } });
+let elapsed = 0, timer = null, running = false;
+const fmt = s => String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+function delta(){
+  $('clock').textContent = fmt(elapsed);
+  const k = phaseIdx(); const box = $('deltaBox');
+  if(!running && elapsed===0){ box.innerHTML=''; return; }
+  if(k<0 || !tl[k].min){ box.innerHTML=''; return; }
+  const plan = tl[k].min[0]*60; const d = Math.round((elapsed-plan)/60);
+  box.innerHTML = '予定 '+tl[k].min[0]+'分 → '+(d>0?'<span class="delta late">'+d+'分 遅れ</span>':d<0?'<span class="delta ok">'+(-d)+'分 早い</span>':'<span class="delta ok">ちょうど</span>');
+}
+$('tStart').onclick = ()=>{ if(running) return; running=true; timer=setInterval(()=>{ elapsed++; delta(); },1000); };
+$('tPause').onclick = ()=>{ running=false; clearInterval(timer); };
+$('tReset').onclick = ()=>{ running=false; clearInterval(timer); elapsed=0; delta(); };
+
+/* --- 教案・準備物 --- */
+$('tabPlan').innerHTML = L.plan || '<p class="sub">この課の教案はありません。</p>';
+$('tabInfo').innerHTML = L.info.length ? '<table>'+L.info.map(r=>'<tr><th style="width:120px">'+esc(r[0])+'</th><td>'+esc(r[1]).replace(/\n/g,'<br>')+'</td></tr>').join('')+'</table>' : '<p class="sub">情報がありません。</p>';
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  $('tabPlan').style.display = b.dataset.tab==='plan'?'block':'none'; $('tabInfo').style.display = b.dataset.tab==='info'?'block':'none';
+});
+AudioPanel.render(document.getElementById("audioBox"), N);
+draw(false);
+}
+</script>
+</body>
+</html>
