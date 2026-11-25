@@ -13,6 +13,9 @@ function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;'
 function ruby(s){ return esc(s).replace(/([一-龥々]+)\{([^}]+)\}/g, '<ruby>$1<rt>$2</rt></ruby>'); }
 function renderHeader(active, base){
   base = base || '';
+  try{ if(new URLSearchParams(location.search).get('st')==='1') sessionStorage.setItem('nj:student','1'); }catch(e){}
+  let stu=false; try{ stu = sessionStorage.getItem('nj:student')==='1'; }catch(e){}
+  if(stu){ const h=document.createElement('header'); h.className='top'; h.innerHTML='<a class="logo" href="'+base+'student.html">日本語クラス</a><nav><a href="'+base+'student.html">← もどる / Back</a></nav>'; document.body.prepend(h); document.body.classList.add('student'); return; }
   const items = [['index.html','ホーム'],['pages/explain.html','説明資料'],['pages/cando.html','Can-do'],['pages/roleplay.html','ロールプレイ'],['pages/quiz.html','質問・クイズ'],['progress.html','生徒・進捗'],['kana.html?s=hira','ひらがな'],['kana.html?s=kata','カタカナ'],['kanji.html','漢字']];
   const h = document.createElement('header'); h.className='top';
   h.innerHTML = '<a class="logo" href="'+base+'index.html">日本語クラス</a><nav>' +

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>日本語クラス 生徒用 | Student</title><link rel="stylesheet" href="css/style.css">
+<style>.big-tile{display:flex;gap:14px;align-items:center;padding:16px 18px}.big-tile .ic{font-size:36px;flex:none;width:48px;text-align:center}.big-tile h3{margin:0;font-size:20px}.big-tile p{margin:2px 0 0;color:var(--muted);font-size:14px}</style>
+</head><body>
+<main style="max-width:760px">
+  <h1>日本語クラス <span class="pill">生徒用 / Student</span></h1>
+  <p class="sub">じぶんで れんしゅう しよう。/ Practice by yourself.</p>
+  <section class="card" style="margin-bottom:16px">
+    <label style="margin-top:0">課 / Lesson</label><select id="lsel"></select>
+  </section>
+  <div class="grid" style="gap:12px">
+    <a class="card tile big-tile" id="tVocab"><span class="ic">🗂</span><div><h3>ことば カード</h3><p>Word cards</p></div></a>
+    <a class="card tile big-tile" id="tQuiz"><span class="ic">❓</span><div><h3>クイズ</h3><p>Quiz</p></div></a>
+    <a class="card tile big-tile" id="tRole"><span class="ic">🎭</span><div><h3>ロールプレイ</h3><p>Role play (conversation practice)</p></div></a>
+  </div>
+  <h2 style="margin-top:24px">もじ / Letters</h2>
+  <div class="grid g3" style="gap:12px">
+    <a class="card tile" href="kana.html?s=hira&st=1"><div class="ic">あ</div><h3>ひらがな</h3><p>Hiragana</p></a>
+    <a class="card tile" href="kana.html?s=kata&st=1"><div class="ic">ア</div><h3>カタカナ</h3><p>Katakana</p></a>
+    <a class="card tile" href="kanji.html?st=1"><div class="ic">漢</div><h3>漢字</h3><p>Kanji N5–N3</p></a>
+  </div>
+  <p class="sub" style="margin-top:24px;font-size:13px">📱 スマホ・タブレットでも つかえます。🔊 の おとが でない ときは、おとを ONに してください。<br>Works on phones and tablets. Turn the sound on to hear 🔊.</p>
+</main>
+<script src="data/index.js"></script><script src="js/app.js"></script><script src="js/student.js"></script>
+<script>
+function go(n){ S.save(n); const q='?n='+n; S.$('tVocab').href='s-vocab.html'+q; S.$('tQuiz').href='s-quiz.html'+q; S.$('tRole').href='s-roleplay.html'+q; }
+S.select(S.$('lsel'), S.cur(), go); go(S.cur());
+</script></body></html>

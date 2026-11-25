@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ロールプレイ</title><link rel="stylesheet" href="css/style.css">
+<style>.jp{font-size:21px;line-height:1.7;display:block}.en{color:#555;font-size:.72em;font-weight:400;font-family:Arial,Helvetica,sans-serif;display:block;margin-top:2px}.hide-en .en{display:none}
+.sc{display:flex;gap:8px;align-items:center;padding:12px 6px;border-bottom:1px dashed var(--line);cursor:pointer}.sc.on{background:var(--accent-soft);font-weight:700}.sc small{color:var(--muted);font-weight:400;display:block;font-family:Arial,sans-serif}
+.bubble{cursor:pointer}.bubble.cover .jp,.bubble.cover .en{filter:blur(9px)}.me{outline:2px solid var(--green)}</style></head><body>
+<main style="max-width:860px">
+  <h1 style="margin:0 0 8px">ロールプレイ <span class="pill">Role play</span></h1>
+  <section class="card" style="margin-bottom:12px"><label style="margin-top:0">課 / Lesson</label><select id="lsel"></select></section>
+  <div class="grid" style="grid-template-columns:minmax(0,1fr);gap:12px">
+    <section class="card" style="padding:6px 14px"><div id="list"></div></section>
+    <section class="card" id="scene"><div class="sub">ばめんを えらんで ください。/ Choose a scene.</div></section>
+  </div>
+</main>
+<script src="data/index.js"></script><script src="data/roleplay.js"></script><script src="js/app.js"></script><script src="js/student.js"></script>
+<script>
+S.header('ロールプレイ');
+const BANK=window.RP_BANK||[]; let N=S.cur(), cur=null, hideEn=false, myRole='', cover=false;
+function list(){ const a=BANK.map((r,i)=>[r,i]).filter(([r])=>r.n===N);
+  S.$('list').innerHTML=a.length?a.map(([r,i])=>'<div class="sc'+(i===cur?' on':'')+'" data-i="'+i+'"><div>'+ruby(r.t)+'<small>'+esc(r.te||'')+'</small></div></div>').join(''):'<p class="sub">この課には ばめんが ありません。/ No scenes yet.</p>';
+  S.$('list').querySelectorAll('.sc').forEach(el=>el.onclick=()=>{ cur=+el.dataset.i; myRole=''; cover=false; list(); show(); S.$('scene').scrollIntoView({behavior:'smooth'}); }); }
+function show(){
+  const r=BANK[cur]; if(!r) return;
+  const names={A:r.a+(r.ae?' / '+r.ae:''),B:r.b+(r.be?' / '+r.be:'')};
+  S.$('scene').className='card'+(hideEn?' hide-en':'');
+  S.$('scene').innerHTML='<h2 style="margin-bottom:4px">'+ruby(r.t)+'</h2><p style="margin:0 0 8px">'+ruby(r.sit)+'<span class="en">'+esc(r.site||'')+'</span></p>'+
+   '<div class="row" style="margin-bottom:8px"><label style="margin:0">わたしは / I am:</label>'+['A','B'].map(k=>'<button data-role="'+k+'" class="'+(myRole===k?'btn-primary':'')+'">'+ruby(r[k.toLowerCase()])+'</button>').join('')+
+   '<button id="en">English ON/OFF</button><button id="rst">↺</button></div>'+
+   '<p class="sub" style="margin:0 0 6px;font-size:13px">'+(myRole?'みどりの わくが あなたの せりふ です。ぼかした ところを タップすると みえます。 / Green box = your lines. Tap blurred lines to reveal.':'やくを えらぶと、あなたの せりふを かくして れんしゅう できます。 / Pick a role to hide your lines and practice.')+'</p>'+
+   r.l.map(([w,jp,en],k)=>'<div class="bubble '+(w==='A'?'t':'s')+(myRole===w?' me cover':'')+'" data-k="'+k+'"><b>'+esc(names[w]||w)+'</b><span class="jp">'+ruby(jp)+'</span><span class="en">'+esc(en||'')+'</span></div>').join('');
+  S.$('scene').querySelectorAll('[data-role]').forEach(b=>b.onclick=()=>{ myRole=(myRole===b.dataset.role?'':b.dataset.role); show(); });
+  S.$('en').onclick=()=>{ hideEn=!hideEn; show(); }; S.$('rst').onclick=()=>show();
+  S.$('scene').querySelectorAll('.bubble').forEach(b=>b.onclick=()=>{ b.classList.remove('cover'); S.speak(r.l[+b.dataset.k][1]); });
+}
+S.select(S.$('lsel'),N,n=>{ N=n; cur=null; S.$('scene').innerHTML='<div class="sub">ばめんを えらんで ください。/ Choose a scene.</div>'; list(); });
+list();
+</script></body></html>

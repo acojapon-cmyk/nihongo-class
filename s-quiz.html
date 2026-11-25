@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>クイズ</title><link rel="stylesheet" href="css/style.css"></head><body>
+<main style="max-width:760px">
+  <h1 style="margin:0 0 8px">クイズ <span class="pill">Quiz</span></h1>
+  <section class="card" style="margin-bottom:12px">
+    <label style="margin-top:0">課 / Lesson</label><select id="lsel"></select>
+    <div class="row">
+      <div style="flex:1;min-width:150px"><label>しゅるい / Type</label><select id="mode"><option value="mc">4択 / Multiple choice</option><option value="oral">しつもん カード / Question cards</option></select></div>
+      <div style="flex:1;min-width:150px"><label>はんい / Range</label><select id="scope"><option value="one">この課だけ / This lesson</option><option value="upto">この課まで / Up to this lesson</option></select></div>
+      <div style="width:100px"><label>もんだい数</label><select id="cnt"><option>5</option><option selected>10</option><option>20</option></select></div>
+    </div>
+    <div class="row" id="dirRow" style="margin-top:6px"><label style="margin:0">むき / Direction</label><select id="dir" style="width:auto"><option value="mix">まぜる / Mixed</option><option value="wm">ことば → いみ</option><option value="mw">いみ → ことば</option></select></div>
+    <div class="row" style="margin-top:10px"><button class="btn-primary" id="start" style="font-size:18px;padding:10px 26px">▶ はじめる / Start</button></div>
+  </section>
+  <div id="area"></div>
+</main>
+<script src="data/index.js"></script><script src="data/quiz.js"></script><script src="js/app.js"></script><script src="js/quiz.js"></script><script src="js/student.js"></script>
+<script>
+S.header('クイズ');
+const bank=window.QUIZ_BANK||{}, ORDER=S.order();
+const shuffle=S.shuffle, cache={};
+function lessons(){ const n=+S.$('lsel').value; return S.$('scope').value==='one'?[n]:(n>=100?[n]:ORDER.filter(x=>x<=n&&x<100)); }
+function loadL(n){ return new Promise(res=>{ if(cache[n]) return res(cache[n]); window.LESSONS=window.LESSONS||{}; if(window.LESSONS[n]) return res(cache[n]=window.LESSONS[n]);
+  const sc=document.createElement('script'); sc.src='data/L'+pad2(n)+'.js'; sc.onload=()=>res(cache[n]=window.LESSONS[n]); sc.onerror=()=>res(null); document.head.appendChild(sc); }); }
+async function mcQuestions(){
+  const pairs=[];
+  for(const n of lessons()){ const L=await loadL(n); if(!L) continue;
+    (L.vocab||[]).forEach(v=>{ if(v.w&&v.m&&v.w.length<=22&&v.m.length<=30&&!/[→=]/.test(v.w)&&!/^[⇔]/.test(v.m)) pairs.push({w:v.w.trim(),m:v.m.trim()}); }); }
+  const seen=new Set(), uniq=pairs.filter(p=>!seen.has(p.w)&&seen.add(p.w));
+  const ms=[...new Set(uniq.map(p=>p.m))], ws=[...new Set(uniq.map(p=>p.w))];
+  if(ms.length<4) return [];
+  const dir=S.$('dir').value;
+  return shuffle(uniq).map(p=>{
+    const rev=dir==='mw'||(dir==='mix'&&Math.random()<.5);
+    if(!rev){ return {p:esc(p.w), a:p.m, o:[p.m].concat(Quiz.distract(p.m,ms,3)), speak:p.w}; }
+    return {p:'<span style="font-size:30px">'+esc(p.m)+'</span>', a:p.w, o:[p.w].concat(Quiz.distract(p.w,ws,3))};
+  }).filter(q=>q.o.length>=4);
+}
+async function start(){
+  const n=+S.$('cnt').value, area=S.$('area');
+  if(S.$('mode').value==='oral'){
+    let cards=[]; lessons().forEach(k=>(bank[k]||[]).forEach(([q,a])=>cards.push({t:S.label(k), p:ruby(q), a:ruby(a), speak:q})));
+    if(!cards.length){ area.innerHTML='<div class="stage"><div class="mid">この範囲には しつもんが ありません。</div></div>'; return; }
+    Quiz.cards(area, shuffle(cards).slice(0,n));
+  } else {
+    area.innerHTML='<div class="stage"><div class="mid">じゅんび中…</div></div>';
+    const qs=(await mcQuestions()).slice(0,n);
+    if(!qs.length){ area.innerHTML='<div class="stage"><div class="mid">ことばが たりません。「この課まで」に してください。<br><span class="small">Not enough words. Choose “Up to this lesson”.</span></div></div>'; return; }
+    Quiz.run(area, qs, act=>{ if(act==='again') start(); else area.innerHTML=''; });
+  }
+  area.scrollIntoView({behavior:'smooth'});
+}
+S.$('mode').onchange=()=>{ S.$('dirRow').style.display=S.$('mode').value==='mc'?'flex':'none'; };
+S.$('start').onclick=start;
+S.select(S.$('lsel'),S.cur(),()=>{});
+</script></body></html>
