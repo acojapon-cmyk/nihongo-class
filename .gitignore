@@ -1,0 +1,7 @@
+# 教材由来の画像・大きなファイルは公開しない
+slides/
+cando/
+images-*/
+*.zip
+*.pptx
+*.docx

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Can-do説明資料 | 日本語クラス</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+main.wide{max-width:1300px}
+.tabs2{display:flex;gap:4px;margin:6px 0 12px;flex-wrap:wrap}
+.tabs2 button{border-radius:9px}
+.tabs2 button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.viewer{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr);gap:16px;align-items:start}
+@media(max-width:1000px){.viewer{grid-template-columns:minmax(0,1fr)}.viewer>*{min-width:0}}
+.pv{position:relative;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;aspect-ratio:16/9}
+.pv img{width:100%;height:100%;object-fit:contain;display:block}
+.ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chips button{padding:4px 10px;font-size:14px;border-radius:999px}
+.chips button.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.strip{display:flex;gap:6px;overflow-x:auto;padding:8px 2px}
+.strip img{width:128px;height:72px;object-fit:cover;border:3px solid transparent;border-radius:6px;cursor:pointer;flex:none;background:#fff}
+.strip img.cur{border-color:var(--accent)}
+.notes{white-space:pre-wrap;font-size:17px;line-height:1.8;background:#fffbea;border:1px solid #efe2a8;border-radius:10px;padding:12px 14px;min-height:120px}
+.ft{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.ft select,.ft input{width:auto}
+table.cd{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+table.cd th,table.cd td{border:1px solid var(--line);padding:6px 8px;vertical-align:top}
+table.cd th{background:#f4efe6;position:sticky;top:57px}
+.dg{font-weight:700;text-align:center;white-space:nowrap}
+.dg.a{color:var(--green)} .dg.b{color:var(--amber)} .dg.c{color:var(--muted)}
+kbd{background:#eee;border:1px solid #ccc;border-radius:4px;padding:0 5px;font-size:13px}
+</style>
+</head>
+<body>
+<main class="wide">
+  <h1>Can-do説明資料</h1>
+  <p class="sub">『みんなの日本語』課ごとのCan-do(できること)を、生徒と共有するためのページです。授業の目標を見せる・授業のあとで振り返る、に使います。画面共有でそのまま使えます。</p>
+  <div class="tabs2">
+    <button class="on" data-tab="slides">📊 課別Can-doスライド</button>
+    <button data-tab="table">🔎 Can-do対応表(絞り込み)</button>
+    <button data-tab="legend">ℹ 見かたの説明</button>
+  </div>
+
+  <section id="tSlides">
+    <div class="row" style="justify-content:space-between">
+      <div class="row">
+        <button id="langJp" class="btn-primary">日本語版</button><button id="langEn">English version</button>
+      </div>
+      <span class="sub" style="margin:0;font-size:13px"><kbd>←</kbd><kbd>→</kbd> で進む ／ ふりがな入りの日本語版・英語つきのEN版</span>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="viewer">
+      <div>
+        <div class="pv"><img id="cur" alt=""></div>
+        <div class="ctl">
+          <button id="prev">◀ 前</button>
+          <button id="next" class="btn-primary">次 ▶</button>
+          <span class="pill" id="pos"></span>
+        </div>
+        <div class="strip" id="strip"></div>
+      </div>
+      <section class="card">
+        <h3 style="margin:0 0 6px">先生用ノート <span class="pill" id="ttl"></span></h3>
+        <div class="notes" id="notes"></div>
+      </section>
+    </div>
+  </section>
+
+  <section id="tTable" style="display:none">
+    <div class="ft">
+      <select id="fLesson"></select>
+      <select id="fCat"></select>
+      <select id="fDeg"><option value="">対応度: すべて</option><option>◎</option><option>○</option><option>△</option></select>
+      <input id="fText" placeholder="ことばで検索(例: 病院、電話、予約)" style="min-width:240px">
+      <span class="pill" id="cnt"></span>
+    </div>
+    <p class="sub" style="margin:0 0 8px;font-size:14px">JF生活日本語Can-do(国際交流基金)と、『いろどり』『みんなの日本語』の課の対応表です。『みんなの日本語』との対応は授業準備用の目安(非公式)です。</p>
+    <div style="overflow-x:auto"><table class="cd"><thead><tr><th>みんなの日本語</th><th>JF番号</th><th>場面</th><th>レベル</th><th>JF生活日本語Can-do</th><th>主な文型・表現</th><th>対応度</th><th>いろどり</th></tr></thead><tbody id="tb"></tbody></table></div>
+  </section>
+
+  <section id="tLegend" style="display:none"><div class="card"><table class="cd" id="lg"></table></div></section>
+</main>
+<script src="../js/app.js"></script>
+<script src="../data/cando.js"></script>
+<script>
+renderHeader('pages/cando.html','../');
+const $=id=>document.getElementById(id), pad=n=>String(n).padStart(2,'0');
+const C=window.CANDO;
+let lang='jp', i=parseInt(localStorage.getItem('nj:cando:pos')||'1')||1;
+/* 課ジャンプ: スライドのタイトルから課番号を拾う */
+const jump=[]; C.jp.forEach((s,k)=>{ if(/Can-do$/.test(s.t)&&/第/.test(s.t)) jump.push([s.t.replace(/\s*Can-do$/,''),k+1]); else if(/ぜんたいマップ/.test(s.t)) jump.push([s.t.replace(/\s*[（(].*$/,'').replace(/\s/g,''),k+1]); else if(/ふりかえり/.test(s.t)){ const m=s.t.match(/第(\d+)〜(\d+)課/); jump.push(['ふりかえり'+(m?m[1]+'〜'+m[2]+'課':''),k+1]); } });
+$('chips').innerHTML=jump.map(([l,k])=>'<button data-k="'+k+'">'+esc(l)+'</button>').join('');
+document.querySelectorAll('#chips button').forEach(b=>b.onclick=()=>{i=+b.dataset.k;draw();});
+const src=n=>'../cando/'+lang+'/s-'+pad(n)+'.jpg';
+function strip(){ $('strip').innerHTML=C[lang].map((s,k)=>'<img loading="lazy" data-i="'+(k+1)+'" src="'+src(k+1)+'" title="'+(k+1)+'">').join(''); document.querySelectorAll('.strip img').forEach(el=>el.onclick=()=>{i=+el.dataset.i;draw();}); }
+function draw(){
+  const T=C[lang].length; i=Math.min(Math.max(i,1),T); localStorage.setItem('nj:cando:pos',i);
+  $('cur').src=src(i); $('pos').textContent=i+' / '+T; $('ttl').textContent=C[lang][i-1].t;
+  $('notes').textContent=(C.jp[i-1]||{}).note||'';
+  document.querySelectorAll('.strip img').forEach(el=>el.classList.toggle('cur',+el.dataset.i===i));
+  const cur=document.querySelector('.strip img.cur'), sb=$('strip'); if(cur) sb.scrollLeft=cur.offsetLeft-sb.clientWidth/2+cur.clientWidth/2;
+  document.querySelectorAll('#chips button').forEach(b=>b.classList.toggle('on',+b.dataset.k===i));
+  const p=new Image(); p.src=src(i+1);
+}
+function setLang(l){ lang=l; $('langJp').classList.toggle('btn-primary',l==='jp'); $('langEn').classList.toggle('btn-primary',l==='en'); strip(); draw(); }
+$('langJp').onclick=()=>setLang('jp'); $('langEn').onclick=()=>setLang('en');
+$('prev').onclick=()=>{i--;draw();}; $('next').onclick=()=>{i++;draw();};
+document.addEventListener('keydown',e=>{ if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return; if($('tSlides').style.display==='none') return;
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();i++;draw();} else if(e.key==='ArrowLeft'){i--;draw();} else if(e.key==='Home'){i=1;draw();} else if(e.key==='End'){i=99;draw();} });
+setLang('jp');
+
+/* 対応表 */
+const R=C.rows;
+const lessons=[...new Set(R.map(r=>r[0]))];
+const cats=[...new Set(R.map(r=>r[3]))].filter(Boolean);
+$('fLesson').innerHTML='<option value="">課: すべて</option>'+lessons.map(l=>'<option>'+esc(l)+'</option>').join('');
+$('fCat').innerHTML='<option value="">場面: すべて</option>'+cats.map(l=>'<option>'+esc(l)+'</option>').join('');
+function tbl(){
+  const a=$('fLesson').value,b=$('fCat').value,c=$('fDeg').value,t=$('fText').value.trim();
+  const rows=R.filter(r=>(!a||r[0]===a)&&(!b||r[3]===b)&&(!c||r[9]===c)&&(!t||r.join(' ').includes(t)));
+  $('cnt').textContent=rows.length+' 件';
+  $('tb').innerHTML=rows.map(r=>'<tr><td>'+esc(r[0])+'</td><td>'+esc(r[2])+'</td><td>'+esc(r[3])+'</td><td>'+esc(r[6])+'</td><td>'+esc(r[7])+'</td><td>'+esc(r[8])+'</td><td class="dg '+({'◎':'a','○':'b','△':'c'}[r[9]]||'')+'">'+esc(r[9])+'</td><td>'+esc(r[10])+'</td></tr>').join('');
+}
+['fLesson','fCat','fDeg'].forEach(id=>$(id).onchange=tbl); $('fText').oninput=tbl; tbl();
+$('lg').innerHTML=C.legend.map((r,k)=>k===0?'<tr><th style="width:28%">'+esc(r[0])+'</th><th>'+esc(r[1])+'</th></tr>':'<tr><td><b>'+esc(r[0])+'</b></td><td>'+esc(r[1])+'</td></tr>').join('');
+
+/* タブ */
+document.querySelectorAll('.tabs2 button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs2 button').forEach(x=>x.classList.toggle('on',x===b));
+  $('tSlides').style.display=b.dataset.tab==='slides'?'block':'none';
+  $('tTable').style.display=b.dataset.tab==='table'?'block':'none';
+  $('tLegend').style.display=b.dataset.tab==='legend'?'block':'none';
+});
+</script>
+</body>
+</html>

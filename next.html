@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>今日のまとめ・次回予告 | 日本語クラス</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+body{background:#fff}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 28px}
+.hd{display:flex;align-items:baseline;gap:14px;border-bottom:4px solid var(--accent);padding-bottom:8px;margin-bottom:18px}
+.hd h1{font-size:40px;margin:0}
+.sec{margin:20px 0}
+.sec h2{font-size:26px;border-left:8px solid var(--accent);padding-left:12px;margin-bottom:10px}
+.sec.nx h2{border-color:var(--blue)}
+.cando{font-size:28px;display:flex;gap:12px;align-items:center;padding:8px 0;cursor:pointer;user-select:none}
+.cando .bx{width:38px;height:38px;border:3px solid var(--ink);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;flex:none}
+.cando.on .bx{background:var(--green);color:#fff;border-color:var(--green)}
+.hw{font-size:24px;padding:6px 0;display:flex;gap:10px}
+.pat{font-size:26px;background:#faf7f2;border-radius:12px;padding:12px 18px}
+.words{display:flex;flex-wrap:wrap;gap:10px}
+.words span{font-size:26px;background:#eaf3f8;border-radius:10px;padding:4px 14px}
+.when{font-size:34px;font-weight:700;color:var(--blue)}
+.msg{font-size:24px;white-space:pre-wrap}
+.edit{background:#fffbea;border:1px dashed #d8c36a;border-radius:12px;padding:12px 16px;margin-bottom:18px}
+.shareon .edit{display:none}
+@media(max-width:700px){.wrap{padding:14px 12px}.hd{flex-wrap:wrap}.hd h1{font-size:28px}.sec h2{font-size:20px}.cando{font-size:20px}.hw{font-size:18px}.pat{font-size:19px}.words span{font-size:19px}.when{font-size:24px}.msg{font-size:18px}.edit select,.edit input{width:100%!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="edit noprint" id="edit">
+    <div class="row">
+      <label style="margin:0">課</label><select id="lsel" style="width:auto"></select>
+      <label style="margin:0">次回の日時</label><input id="when" type="datetime-local" style="width:auto">
+      <button id="share" class="btn-primary">画面共有モード(編集を隠す)</button>
+      <button onclick="window.print()">印刷</button><a id="toReview" class="btn" style="padding:6px 14px;border:1px solid var(--line);border-radius:9px;background:#fff">📘 復習プリント(PDF)</a><a href="" id="back" style="color:var(--blue);text-decoration:underline">授業コンソールへ</a>
+    </div>
+    <label>生徒へのひとこと</label><input id="msgIn" placeholder="例: よくがんばりました!ことばを3回よんできてください。">
+    <label>宿題(1行に1つ。空にすると教案の宿題を使います)</label><textarea id="hwIn" style="min-height:70px"></textarea>
+    <label>今日のできたチェック: クリックで ✔</label>
+    <div class="sub" style="margin:0">下の「今日できるようになったこと」をクリックして ✔ をつけます。</div>
+  </div>
+
+  <div class="hd"><h1 id="h1"></h1><span class="pill" id="date"></span></div>
+  <div class="sec"><h2>今日の ぶんけい</h2><div class="pat" id="pat"></div></div>
+  <div class="sec"><h2>今日 できるように なったこと</h2><div id="cando"></div></div>
+  <div class="sec"><h2>しゅくだい</h2><div id="hw"></div></div>
+  <div class="sec msgs" id="msgSec" style="display:none"><h2>せんせいから</h2><div class="msg" id="msg"></div></div>
+  <div class="sec nx"><h2>つぎは</h2>
+    <div class="row" style="align-items:baseline;gap:20px"><div class="when" id="nTitle"></div><div class="when" style="color:var(--ink);font-size:26px" id="nWhen"></div></div>
+    <div class="pat" id="nPat" style="margin:10px 0"></div>
+    <div id="nCando" style="font-size:22px"></div>
+    <h3 style="font-size:22px;margin:14px 0 6px">よしゅう(つぎの ことば)</h3>
+    <div class="words" id="nWords"></div>
+  </div>
+</div>
+<script src="data/index.js"></script>
+<script src="js/app.js"></script>
+<script>
+const q = new URLSearchParams(location.search); const N = parseInt(q.get('n'))||1;
+const $ = id=>document.getElementById(id);
+$('lsel').innerHTML = LESSON_INDEX.map(l=>'<option value="'+l.n+'"'+(l.n===N?' selected':'')+'>'+esc(l.label)+' '+esc(l.title)+'</option>').join('');
+$('lsel').onchange = ()=>location.href='next.html?n='+$('lsel').value;
+$('back').href = 'lesson.html?n='+N; $('toReview').href = 'review.html?n='+N;
+$('date').textContent = new Date().toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'short'});
+const KEY = 'nextpage:'+N; const saved = store.get(KEY, {});
+$('when').value = saved.when||''; $('msgIn').value = saved.msg||''; $('hwIn').value = saved.hw||'';
+['when','msgIn','hwIn'].forEach(id=>$(id).addEventListener('input', ()=>{ store.set(KEY, {when:$('when').value, msg:$('msgIn').value, hw:$('hwIn').value}); renderDyn(); }));
+$('share').onclick = ()=>{ document.body.classList.toggle('shareon'); $('share').textContent='編集を表示'; };
+function lines(v){ return (v||'').split('\n').map(x=>x.trim()).filter(Boolean); }
+function getInfo(L,k){ const r=L.info.find(x=>x[0]===k); return r?r[1]:''; }
+let cur=null;
+function renderDyn(){
+  if(!cur) return;
+  const hw = lines($('hwIn').value).length ? lines($('hwIn').value) : cur.homework;
+  $('hw').innerHTML = hw.length ? hw.map(h=>'<div class="hw"><span>☐</span><span>'+esc(h)+'</span></div>').join('') : '<div class="hw">なし</div>';
+  const m=$('msgIn').value.trim(); $('msgSec').style.display = m?'block':'none'; $('msg').textContent = m;
+  const w=$('when').value; $('nWhen').textContent = w ? new Date(w).toLocaleString('ja-JP',{month:'long',day:'numeric',weekday:'short',hour:'2-digit',minute:'2-digit'}) : '';
+}
+const doneKey = 'candoDone:'+N; let done = store.get(doneKey, []);
+loadLesson(N, L=>{
+  if(!L){ $('h1').textContent='データなし'; return; } cur=L;
+  $('h1').textContent = ((N<100&&N!==26)?'第'+N+'課 '+L.title:L.title)+' おつかれさま!';
+  $('pat').textContent = getInfo(L,'文型').replace(/／/g,'\n').split('\n').join('  ／  ');
+  const goals = getInfo(L,'到達目標').split('\n').map(x=>x.replace(/^[①-⑩]\s*/,'').trim()).filter(Boolean);
+  $('cando').innerHTML = goals.map((g,i)=>'<div class="cando'+(done.includes(i)?' on':'')+'" data-i="'+i+'"><span class="bx">'+(done.includes(i)?'✔':'')+'</span><span>'+esc(g)+'</span></div>').join('') || '<div class="sub">到達目標のデータがありません</div>';
+  document.querySelectorAll('.cando').forEach(el=>el.onclick=()=>{ const i=+el.dataset.i; done = done.includes(i)? done.filter(x=>x!==i) : done.concat(i); store.set(doneKey,done); el.classList.toggle('on'); el.querySelector('.bx').textContent = el.classList.contains('on')?'✔':''; });
+  renderDyn();
+  const NEXT = N===101?102:N===102?1:N+1;
+  const nxt = LESSON_INDEX.find(l=>l.n===NEXT);
+  if(!nxt){ $('nTitle').textContent=((N<100&&N!==26)?'第'+N+'課':L.title)+'までで おわりです'; return; }
+  $('nTitle').textContent = nxt.label+' '+nxt.title;
+  loadLesson(NEXT, M=>{
+    if(!M) return;
+    $('nPat').textContent = getInfo(M,'文型').replace(/／/g,'  ／  ');
+    $('nCando').innerHTML = getInfo(M,'到達目標').split('\n').filter(Boolean).map(g=>'<div>'+esc(g.replace(/^[①-⑩]\s*/,'・'))+'</div>').join('');
+    const seen = new Set(); const ws = M.vocab.filter(v=>v.w.length<=12 && !/[→=]/.test(v.w) && !seen.has(v.w) && seen.add(v.w)).slice(0,10);
+    $('nWords').innerHTML = ws.map(v=>'<span>'+esc(v.w)+'</span>').join('') || '<span class="sub">なし</span>';
+  });
+});
+</script>
+</body>
+</html>
