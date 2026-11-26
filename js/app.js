@@ -15,7 +15,7 @@ function renderHeader(active, base){
   base = base || '';
   try{ if(new URLSearchParams(location.search).get('st')==='1') sessionStorage.setItem('nj:student','1'); }catch(e){}
   let stu=false; try{ stu = sessionStorage.getItem('nj:student')==='1'; }catch(e){}
-  if(stu){ const h=document.createElement('header'); h.className='top'; h.innerHTML='<a class="logo" href="'+base+'student.html">日本語学習<small>使用教材：『みんなの日本語』 / Textbook: Minna no Nihongo</small></a><nav><a href="'+base+'student.html">← もどる / Back</a></nav>'; document.body.prepend(h); document.body.classList.add('student'); return; }
+  if(stu){ const h=document.createElement('header'); h.className='top'; h.innerHTML='<a class="logo" href="'+base+'student.html">日本語学習</a><nav><a href="'+base+'student.html">← もどる / Back</a></nav>'; document.body.prepend(h); document.body.classList.add('student'); return; }
   const items = [['t-1kn9824oom/index.html','ホーム'],['t-1kn9824oom/pages/explain.html','説明資料'],['t-1kn9824oom/pages/cando.html','Can-do'],['t-1kn9824oom/pages/roleplay.html','ロールプレイ'],['t-1kn9824oom/pages/quiz.html','質問・クイズ'],['t-1kn9824oom/progress.html','生徒・進捗'],['kana.html?s=hira','ひらがな'],['kana.html?s=kata','カタカナ'],['kanji.html','漢字']];
   const h = document.createElement('header'); h.className='top';
   h.innerHTML = '<a class="logo" href="'+base+'t-1kn9824oom/index.html">日本語学習<small>使用教材：『みんなの日本語』 / Textbook: Minna no Nihongo</small></a><nav>' +
