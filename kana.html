@@ -7,6 +7,7 @@
 <title>ひらがな・カタカナ | 日本語クラス</title>
 <link rel="stylesheet" href="css/style.css?v=20261126">
 <style>.kana2{grid-template-columns:minmax(0,1.15fr) minmax(300px,1fr)}@media(max-width:900px){.kana2{grid-template-columns:minmax(0,1fr)}}.chart{display:block;overflow-x:auto}</style>
+<style>.mobonly{display:none}@media(max-width:900px){.mobonly{display:inline-block}}</style>
 </head>
 <body>
 <main>
@@ -85,17 +86,18 @@ document.querySelectorAll('#secs .chip').forEach(b=>b.onclick=()=>{ curSec=b.dat
 function drawChart(){
   const sec = D.sections.find(s=>s.id===curSec);
   $('chart').innerHTML = sec.rows.map(r=>'<tr><th>'+esc(r.l)+'</th>'+r.cells.map(c=>c?'<td><button class="kc" data-c="'+esc(c.c)+'">'+esc(c.c)+'<small>'+esc(c.r)+'</small></button></td>':'<td></td>').join('')+'</tr>').join('');
-  document.querySelectorAll('#chart .kc').forEach(b=>b.onclick=()=>showChar(b.dataset.c));
+  document.querySelectorAll('#chart .kc').forEach(b=>b.onclick=()=>{ showChar(b.dataset.c); if(window.matchMedia('(max-width:900px)').matches) setTimeout(()=>$('detail').scrollIntoView({behavior:'smooth',block:'start'}),50); });
 }
 function hl(word, ch){ const e=esc(word), c=esc(ch); return ch.length? e.split(c).join('<mark>'+c+'</mark>') : e; }
 function showChar(ch){
   document.querySelectorAll('#chart .kc').forEach(b=>b.classList.toggle('on',b.dataset.c===ch));
   const cell = cells('all').find(c=>c.c===ch) || {c:ch,r:''}; const w = D.words[ch] || {w:[],n:''};
   $('detail').innerHTML = '<div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="bigch">'+esc(ch)+'</div><div style="text-align:center;font-size:22px;color:var(--muted)">'+esc(cell.r)+'</div></div><div id="padbox"></div></div>'+
-    '<div class="row" style="margin:8px 0"><button id="spk">🔊 きく</button></div>'+
+    '<div class="row" style="margin:8px 0"><button id="spk">🔊 きく</button><button class="mobonly" id="ktop">▲ 一覧にもどる</button></div>'+
     '<h3>この もじを つかった ことば</h3>'+
     (w.w.length? w.w.map(x=>'<div class="wd"><span>'+hl(x[0],ch)+'</span><button class="small-btn" data-sp="'+esc(x[0])+'">🔊</button><span class="m">'+esc(x[1])+'</span></div>').join('') : '<div class="sub">ことばの れいは ありません。</div>')+
     (w.n?'<p class="sub" style="margin-top:8px">📝 '+esc(w.n)+'</p>':'');
+  $('ktop').onclick=()=>$('chart').scrollIntoView({behavior:'smooth',block:'start'});
   $('spk').onclick = ()=>speak(ch.replace(/[っッー]/g,'')||ch);
   document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>speak(b.dataset.sp));
   pad = WritePad($('padbox'), 230); pad.set(ch);

@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>漢字 | 日本語クラス</title>
 <link rel="stylesheet" href="css/style.css?v=20261126">
+<style>.kanji2{grid-template-columns:minmax(0,1fr) minmax(320px,1.1fr)}@media(max-width:900px){.kanji2{grid-template-columns:minmax(0,1fr)}}.mobonly{display:none}@media(max-width:900px){.mobonly{display:inline-block}}</style>
 </head>
 <body>
 <main>
@@ -23,7 +24,7 @@
   <div class="row noprint" id="groups" style="margin-bottom:12px"></div>
 
   <div id="tList">
-    <div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(320px,1.1fr);align-items:start">
+    <div class="grid kanji2" style="align-items:start">
       <section class="card"><div class="kgrid" id="kgrid"></div></section>
       <section class="card" id="detail"><div class="sub">左の漢字をクリックしてください。</div></section>
     </div>
@@ -69,19 +70,19 @@ function drawGroups(){
 function drawGrid(){
   const it = items(); $('cnt').textContent = 'N'+LV+' · '+it.length+'字';
   $('kgrid').innerHTML = it.map(k=>'<button class="kc" data-n="'+k.no+'">'+esc(k.k)+'<small>'+esc(k.m.split(/[;,]/)[0])+'</small></button>').join('');
-  document.querySelectorAll('#kgrid .kc').forEach(b=>b.onclick=()=>show(+b.dataset.n));
+  document.querySelectorAll('#kgrid .kc').forEach(b=>b.onclick=()=>{ show(+b.dataset.n); if(window.matchMedia('(max-width:900px)').matches) setTimeout(()=>$('detail').scrollIntoView({behavior:'smooth',block:'start'}),50); });
 }
 function show(no){
   const k = KANJI[LV].items.find(x=>x.no===no); if(!k) return; curK = k;
   document.querySelectorAll('#kgrid .kc').forEach(b=>b.classList.toggle('on',+b.dataset.n===no));
   const list = items(), i = list.findIndex(x=>x.no===no);
-  $('detail').innerHTML = '<div class="row" style="justify-content:space-between"><span class="pill">'+esc(k.g)+' · No.'+k.no+'</span><div class="row"><button id="kp">◀</button><button id="kn">▶</button></div></div>'+
+  $('detail').innerHTML = '<div class="row" style="justify-content:space-between"><span class="pill">'+esc(k.g)+' · No.'+k.no+'</span><div class="row"><button class="mobonly" id="ktop">▲ 一覧</button><button id="kp">◀</button><button id="kn">▶</button></div></div>'+
     '<div class="row" style="align-items:center;margin-top:6px"><div class="bigch" style="font-size:130px">'+esc(k.k)+'</div><img class="kpic" src="kanji/N'+LV+'/'+k.p+'" alt=""><div><div style="font-size:26px;font-weight:700">'+esc(k.m)+'</div><div class="sub" style="margin:0">'+k.st+'画</div></div></div>'+
     '<table style="margin:8px 0;font-size:20px"><tr><td class="sub" style="padding-right:12px">音読み</td><td>'+esc(k.on)+'</td></tr><tr><td class="sub">訓読み</td><td>'+esc(k.kun)+'</td></tr></table>'+
     '<h3>ことば</h3>'+k.w.map(w=>'<div class="wd"><span>'+esc(w[0])+'</span><span style="font-size:18px">'+esc(w[1])+'</span><button class="small-btn" data-sp="'+esc(w[1])+'">🔊</button><span class="m">'+esc(w[2])+'</span></div>').join('')+
     '<div style="margin-top:12px"><h3>かいて みよう</h3><div id="padbox"></div></div>';
   document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>speak(b.dataset.sp));
-  $('kp').onclick=()=>{ if(i>0) show(list[i-1].no); }; $('kn').onclick=()=>{ if(i<list.length-1) show(list[i+1].no); };
+  $('ktop').onclick=()=>$('kgrid').scrollIntoView({behavior:'smooth',block:'start'}); $('kp').onclick=()=>{ if(i>0) show(list[i-1].no); }; $('kn').onclick=()=>{ if(i<list.length-1) show(list[i+1].no); };
   pad = WritePad($('padbox'), 280); pad.set(k.k);
 }
 document.querySelectorAll('.lv').forEach(b=>b.onclick=()=>setLevel(b.dataset.l));
