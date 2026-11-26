@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><base href="../">
+<meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>アクセント比較テスト</title><link rel="stylesheet" href="css/style.css?v=20261126">
+<style>td{padding:8px 12px;font-size:22px}button{font-size:20px;padding:8px 16px}</style></head><body>
+<main><h1>アクセント比較テスト</h1>
+<p class="sub">左(ひらがな／カタカナ)と右(漢字)を聞き比べて、どちらが自然か教えてください。</p>
+<table id="t"></table></main>
+<script src="js/pad.js?v=20261127f"></script>
+<script>
+const P=[['じしょ','辞書'],['えんぴつ','鉛筆'],['とけい','時計'],['くるま','車'],['でんわ','電話'],['がくせい','学生'],['ボールペン','ボールペン'],['しんぶん','新聞'],['かいしゃ','会社'],['おみやげ','お土産']];
+document.getElementById('t').innerHTML=P.map(p=>'<tr><td><button onclick="speak(\''+p[0]+'\')">🔊 '+p[0]+'</button></td><td><button onclick="speak(\''+p[1]+'\')">🔊 '+p[1]+'</button></td></tr>').join('');
+</script></body></html>
