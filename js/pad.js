@@ -7,7 +7,7 @@ function pickJaVoice(){
     if(/Natural|Neural|Online/i.test(n)) s+=100;
     if(/Nanami|Keita|Mayu|Naoki|Shiori|Daichi/i.test(n)) s+=20;
     if(/Google/i.test(n)) s+=60;
-    if(/Premium|Enhanced|Siri|O-?Ren|Kyoko|Otoya/i.test(n)) s+=40;
+    if(/Premium|Enhanced|拡張|高品質|プレミアム|Siri|O-?Ren|Hattori|Kyoko|Otoya/i.test(n)) s+=40;
     if(/Haruka|Ayumi|Ichiro|Sayaka/i.test(n)) s-=10;
     return s;};
   return vs.slice().sort((a,b)=>score(b)-score(a))[0];
