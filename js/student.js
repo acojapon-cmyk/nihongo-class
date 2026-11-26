@@ -7,9 +7,9 @@ const S = {
   save(n){ try{ localStorage.setItem('nj:sLesson',String(n)); }catch(e){} },
   header(title){
     const h=document.createElement('header'); h.className='top';
-    h.innerHTML='<a class="logo" href="student.html">日本語クラス</a><nav><a href="student.html">← もどる / Back</a></nav>';
+    h.innerHTML='<a class="logo" href="student.html">日本語学習</a><nav><a href="student.html">← もどる / Back</a></nav>';
     document.body.prepend(h);
-    document.title=title+' | 日本語クラス';
+    document.title=title+' | 日本語学習';
   },
   select(el, n, cb){
     el.innerHTML=S.order().map(x=>'<option value="'+x+'">'+esc(S.label(x))+'</option>').join(''); el.value=n;
