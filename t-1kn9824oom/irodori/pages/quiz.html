@@ -50,7 +50,7 @@
 <script src="../data/index.js?v=5"></script>
 <script src="../data/quiz.js?v=5"></script>
 <script src="../js/app.js?v=20261126"></script>
-<script src="../js/quiz.js?v=5"></script>
+<script src="../js/quiz.js?v=20261127e"></script>
 <script>
 renderHeader('pages/quiz.html','../');
 const $ = id => document.getElementById(id);
@@ -96,7 +96,7 @@ async function mcQuestions(){
   return shuffle(uniq).map(p=>{
     const rev = dir==='mw' || (dir==='mix' && Math.random()<.5);
     if(!rev){ const o=[p.m].concat(Quiz.distract(p.m, ms, 3)); return {p:esc(p.w), a:p.m, o}; }
-    const o=[p.w].concat(Quiz.distract(p.w, ws, 3)); return {p:'<span style="font-size:30px">'+esc(p.m)+'</span>', a:p.w, o};
+    const o=[p.w].concat(Quiz.distract(p.w, ws, 3)); return {p:'<span style="font-size:30px">'+esc(p.m)+'</span>', a:p.w, o, say:p.w};
   }).filter(q=>q.o.length>=4);
 }
 async function start(){

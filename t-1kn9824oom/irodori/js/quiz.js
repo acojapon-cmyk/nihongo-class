@@ -19,6 +19,7 @@ const Quiz = {
         if(good) ok++; else wrong.push(q);
         el.querySelectorAll('.qo').forEach(x=>{ if(x.dataset.v===q.a) x.classList.add('good'); else if(x===b) x.classList.add('bad'); });
         el.querySelector('#qfb').innerHTML = '<div class="row"><b style="font-size:20px;color:'+(good?'var(--green)':'var(--accent)')+'">'+(good?'○ せいかい!':'× こたえ: '+esc(q.a))+'</b>'+(q.x?'<span>'+q.x+'</span>':'')+'<button class="btn-primary" id="qnext">'+(i+1>=qs.length?'けっか':'つぎへ ▶')+'</button></div>';
+        if(q.say){ const fb=el.querySelector('#qfb .row'); const sb=document.createElement('button'); sb.textContent='🔊 きく'; sb.onclick=()=>speak(q.say); fb.insertBefore(sb, fb.querySelector('#qnext')); speak(q.say); }
         el.querySelector('#qnext').onclick = ()=>{ i++; draw(); }; el.querySelector('#qnext').focus();
       });
     };
