@@ -50,11 +50,11 @@
 <script src="../data/index.js?v=5"></script>
 <script src="../data/quiz.js?v=5"></script>
 <script src="../js/app.js?v=20261126"></script>
-<script src="../js/quiz.js?v=20261127e"></script>
+<script src="../js/pad.js?v=20261127g"></script><script src="../js/quiz.js?v=20261127e"></script>
 <script>
 renderHeader('pages/quiz.html','../');
 const $ = id => document.getElementById(id);
-function speak(t){ try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(String(t).replace(/\{[^}]*\}/g,'').replace(/[○]/g,'')); u.lang='ja-JP'; u.rate=.85; speechSynthesis.speak(u); }catch(e){} }
+function speak(t){ try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(ttsText(t)); u.lang='ja-JP'; u.rate=.85; speechSynthesis.speak(u); }catch(e){} }
 const IDX = (window.LESSON_INDEX||[]).filter(l=>l.n<100||l.n===26 || true);
 /* 課の並び: 第1課〜26課(その他)、ひらがな・カタカナ */
 const ORDER = IDX.map(l=>l.n).sort((a,b)=>a-b);

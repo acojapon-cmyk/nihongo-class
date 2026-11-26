@@ -1,3 +1,4 @@
+(function(){ try{ if(window.KREAD||window.__kreadLoading) return; window.__kreadLoading=1; var cs=document.currentScript; if(!cs) return; var s=document.createElement('script'); s.src=cs.src.replace(/js\/[^\/]*$/,'data/kread.js?v=1'); document.head.appendChild(s); }catch(e){} })();
 /* 書く練習パッド: うすい見本をなぞる / 自由に書く */
 /* 音声: いちばん自然な日本語の声を選ぶ(Microsoft Natural / Google / Apple 高品質を優先) */
 function pickJaVoice(){
@@ -13,7 +14,7 @@ function pickJaVoice(){
   return vs.slice().sort((a,b)=>score(b)-score(a))[0];
 }
 if(window.speechSynthesis) speechSynthesis.onvoiceschanged=()=>{};
-function ttsText(t){ t=String(t).replace(/[一-龥々〆ヶ]+\{([^}]*)\}/g,'$1').replace(/\{[^}]*\}/g,'').replace(/[○]/g,'').replace(/[（(][^）)]*[）)]/g,'').replace(/^[A-ZＡ-Ｚ][:：]\s*/,'').replace(/[…‥]+/g,'、').replace(/\s+/g,' ').trim(); if(t&&t!=='ー'&&!/[。！？!?、]$/.test(t)) t=t+'。'; return t; }
+function ttsText(t){ t=String(t).replace(/[一-龥々〆ヶ]+\{([^}]*)\}/g,'$1').replace(/\{[^}]*\}/g,'').replace(/[○]/g,'').replace(/[（(][^）)]*[）)]/g,'').replace(/^[A-ZＡ-Ｚ][:：]\s*/,'').replace(/[…‥]+/g,'、').replace(/\s+/g,' ').trim(); if(window.KREAD&&!/[。！？!?]/.test(t)){ if(KREAD[t]) t=KREAD[t]; else t=t.split(/([\s・／\/～〜→]+)/).map(function(x){ return KREAD[x]||x; }).join(''); } if(t&&t!=='ー'&&!/[。！？!?、]$/.test(t)) t=t+'。'; return t; }
 function speak(text){
   try{ if(!('speechSynthesis' in window)) { toast('このブラウザは音声に対応していません'); return; }
     const u = new SpeechSynthesisUtterance(ttsText(text)); u.lang='ja-JP'; u.rate=0.9;

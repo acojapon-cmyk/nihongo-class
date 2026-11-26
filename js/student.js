@@ -1,5 +1,6 @@
+(function(){ try{ if(window.KREAD||window.__kreadLoading) return; window.__kreadLoading=1; var cs=document.currentScript; if(!cs) return; var s=document.createElement('script'); s.src=cs.src.replace(/js\/[^\/]*$/,'data/kread.js?v=1'); document.head.appendChild(s); }catch(e){} })();
 /* 生徒用ページ共通 */
-function ttsText(t){ t=String(t).replace(/[一-龥々〆ヶ]+\{([^}]*)\}/g,'$1').replace(/\{[^}]*\}/g,'').replace(/[○]/g,'').replace(/[（(][^）)]*[）)]/g,'').replace(/^[A-ZＡ-Ｚ][:：]\s*/,'').replace(/[…‥]+/g,'、').replace(/\s+/g,' ').trim(); if(t&&t!=='ー'&&!/[。！？!?、]$/.test(t)) t=t+'。'; return t; }
+function ttsText(t){ t=String(t).replace(/[一-龥々〆ヶ]+\{([^}]*)\}/g,'$1').replace(/\{[^}]*\}/g,'').replace(/[○]/g,'').replace(/[（(][^）)]*[）)]/g,'').replace(/^[A-ZＡ-Ｚ][:：]\s*/,'').replace(/[…‥]+/g,'、').replace(/\s+/g,' ').trim(); if(window.KREAD&&!/[。！？!?]/.test(t)){ if(KREAD[t]) t=KREAD[t]; else t=t.split(/([\s・／\/～〜→]+)/).map(function(x){ return KREAD[x]||x; }).join(''); } if(t&&t!=='ー'&&!/[。！？!?、]$/.test(t)) t=t+'。'; return t; }
 /* 音声: いちばん自然な日本語の声を選ぶ(Microsoft Natural / Google / Apple 高品質を優先) */
 function pickJaVoice(){
   const vs=(window.speechSynthesis?speechSynthesis.getVoices():[]).filter(v=>v.lang&&/^ja/i.test(v.lang.replace('_','-')));
