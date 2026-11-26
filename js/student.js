@@ -1,5 +1,5 @@
 /* 生徒用ページ共通 */
-function ttsText(t){ t=String(t).replace(/[一-龥々〆ヶ]+\{([^}]*)\}/g,'$1').replace(/\{[^}]*\}/g,'').replace(/[○]/g,'').replace(/[（(][^）)]*[）)]/g,'').replace(/^[A-ZＡ-Ｚ][:：]\s*/,'').replace(/[…‥]+/g,'、').replace(/\s+/g,' ').trim(); if(/^[ぁ-んァ-ヶ]$/.test(t)&&t!=='ー') t=t+'。'; return t; }
+function ttsText(t){ t=String(t).replace(/[一-龥々〆ヶ]+\{([^}]*)\}/g,'$1').replace(/\{[^}]*\}/g,'').replace(/[○]/g,'').replace(/[（(][^）)]*[）)]/g,'').replace(/^[A-ZＡ-Ｚ][:：]\s*/,'').replace(/[…‥]+/g,'、').replace(/\s+/g,' ').trim(); if(t&&t!=='ー'&&!/[。！？!?、]$/.test(t)) t=t+'。'; return t; }
 /* 音声: いちばん自然な日本語の声を選ぶ(Microsoft Natural / Google / Apple 高品質を優先) */
 function pickJaVoice(){
   const vs=(window.speechSynthesis?speechSynthesis.getVoices():[]).filter(v=>v.lang&&/^ja/i.test(v.lang.replace('_','-')));

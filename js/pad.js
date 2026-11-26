@@ -13,7 +13,7 @@ function pickJaVoice(){
   return vs.slice().sort((a,b)=>score(b)-score(a))[0];
 }
 if(window.speechSynthesis) speechSynthesis.onvoiceschanged=()=>{};
-function ttsText(t){ t=String(t).replace(/[一-龥々〆ヶ]+\{([^}]*)\}/g,'$1').replace(/\{[^}]*\}/g,'').replace(/[○]/g,'').replace(/[（(][^）)]*[）)]/g,'').replace(/^[A-ZＡ-Ｚ][:：]\s*/,'').replace(/[…‥]+/g,'、').replace(/\s+/g,' ').trim(); if(/^[ぁ-んァ-ヶ]$/.test(t)&&t!=='ー') t=t+'。'; return t; }
+function ttsText(t){ t=String(t).replace(/[一-龥々〆ヶ]+\{([^}]*)\}/g,'$1').replace(/\{[^}]*\}/g,'').replace(/[○]/g,'').replace(/[（(][^）)]*[）)]/g,'').replace(/^[A-ZＡ-Ｚ][:：]\s*/,'').replace(/[…‥]+/g,'、').replace(/\s+/g,' ').trim(); if(t&&t!=='ー'&&!/[。！？!?、]$/.test(t)) t=t+'。'; return t; }
 function speak(text){
   try{ if(!('speechSynthesis' in window)) { toast('このブラウザは音声に対応していません'); return; }
     const u = new SpeechSynthesisUtterance(ttsText(text)); u.lang='ja-JP'; u.rate=0.9;
