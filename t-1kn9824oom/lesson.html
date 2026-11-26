@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><base href="../">
 <meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>授業コンソール | 日本語クラス</title>
@@ -102,7 +102,7 @@ kbd{background:#eee;border:1px solid #ccc;border-radius:4px;padding:0 5px;font-s
 const q = new URLSearchParams(location.search);
 const N = parseInt(q.get('n')) || 1;
 const pad = n => String(n).padStart(2,'0');
-const sc = document.createElement('script'); sc.src = 'data/L'+pad(N)+'.js'; sc.onload = init; sc.onerror = ()=>{ document.body.innerHTML='<main><p>この課のデータが見つかりません。<a href="index.html">ホームへ</a></p></main>'; };
+const sc = document.createElement('script'); sc.src = 'data/L'+pad(N)+'.js'; sc.onload = init; sc.onerror = ()=>{ document.body.innerHTML='<main><p>この課のデータが見つかりません。<a href="t-1kn9824oom/index.html">ホームへ</a></p></main>'; };
 document.head.appendChild(sc);
 
 function init(){
@@ -111,9 +111,9 @@ const L = window.LESSONS[N]; const total = L.slides.length;
 const $ = id => document.getElementById(id);
 const src = n => 'slides/L'+pad(N)+'/s-'+pad(n)+'.jpg';
 let i = parseInt(q.get('s')) || parseInt(localStorage.getItem('nj:pos:'+N)||'1') || 1;
-$('aVocab').href='vocab.html?n='+N; $('aMoji').href = N===102?'kana.html?s=kata':'kana.html?s=hira'; if(N<100) $('aMoji').style.display='none'; $('aNext').href='next.html?n='+N; $('aReview').href='review.html?n='+N;
+$('aVocab').href='t-1kn9824oom/vocab.html?n='+N; $('aMoji').href = N===102?'kana.html?s=kata':'kana.html?s=hira'; if(N<100) $('aMoji').style.display='none'; $('aNext').href='t-1kn9824oom/next.html?n='+N; $('aReview').href='t-1kn9824oom/review.html?n='+N;
 localStorage.setItem('nj:lastLesson', N);
-$('markDone').onclick = ()=>{ const s0=Students.cur(); if(!s0){ toast('先に「生徒・進捗」で生徒を追加してください'); return; } Students.setRec(s0.id, N, {status:'授業済', date:new Date().toISOString().slice(0,10)}); toast(s0.name+' さん: '+(N<100&&N!==26?'第'+N+'課':L.title)+' を授業済にしました'); }; $('finish').onclick = ()=>{ if(Students.cur()) $('markDone').onclick(); location.href='review.html?n='+N+'&print=1'; }; let blank = false; let big = false;
+$('markDone').onclick = ()=>{ const s0=Students.cur(); if(!s0){ toast('先に「生徒・進捗」で生徒を追加してください'); return; } Students.setRec(s0.id, N, {status:'授業済', date:new Date().toISOString().slice(0,10)}); toast(s0.name+' さん: '+(N<100&&N!==26?'第'+N+'課':L.title)+' を授業済にしました'); }; $('finish').onclick = ()=>{ if(Students.cur()) $('markDone').onclick(); location.href='t-1kn9824oom/review.html?n='+N+'&print=1'; }; let blank = false; let big = false;
 const LAB = N===26 ? L.title+'(文法・語彙・文化の補足教材)' : N<100 ? '第'+N+'課 '+L.title : L.title+'(文字の授業)';
 document.title = LAB+' | 日本語クラス';
 $('title').textContent = LAB;
@@ -160,7 +160,7 @@ document.addEventListener('keydown', e=>{
   else if(e.key==='Home'){ i=1; draw(); } else if(e.key==='End'){ i=total; draw(); }
   else if(e.key==='b'||e.key==='B'){ blank=!blank; draw(); }
 });
-$('openPresent').onclick = ()=>{ const w = window.open('present.html?n='+N, 'nj-present', 'width=1280,height=720'); if(!w) toast('ポップアップがブロックされました。許可してください'); setTimeout(send, 800); };
+$('openPresent').onclick = ()=>{ const w = window.open('t-1kn9824oom/present.html?n='+N, 'nj-present', 'width=1280,height=720'); if(!w) toast('ポップアップがブロックされました。許可してください'); setTimeout(send, 800); };
 
 /* --- 時間割とタイマー --- */
 const tl = L.timeline||[];

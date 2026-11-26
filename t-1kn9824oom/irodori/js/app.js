@@ -13,7 +13,7 @@ function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;'
 function ruby(s){ return esc(s).replace(/([一-龥々]+)\{([^}]+)\}/g, '<ruby>$1<rt>$2</rt></ruby>'); }
 function renderHeader(active, base){
   base = base || '';
-  const items = [['index.html','ホーム'],['pages/explain.html','説明資料'],['pages/cando.html','Can-do'],['pages/roleplay.html','ロールプレイ'],['pages/quiz.html','質問・クイズ'],['progress.html','生徒・進捗'],['kana.html?s=hira','ひらがな'],['kana.html?s=kata','カタカナ'],['../kanji.html','漢字'],['pages/audio.html','音声'],['pages/book.html','本冊']];
+  const items = [['index.html','ホーム'],['pages/explain.html','説明資料'],['pages/cando.html','Can-do'],['pages/roleplay.html','ロールプレイ'],['pages/quiz.html','質問・クイズ'],['progress.html','生徒・進捗'],['kana.html?s=hira','ひらがな'],['kana.html?s=kata','カタカナ'],['../../kanji.html','漢字'],['pages/audio.html','音声'],['pages/book.html','本冊']];
   const h = document.createElement('header'); h.className='top';
   h.innerHTML = '<a class="logo" href="'+base+'index.html">日本語学習<small>使用教材：『いろどり』 / Textbook: Irodori</small></a><nav>' +
     items.map(([u,l])=>'<a href="'+base+u+'" class="'+(active===u?'on':'')+'">'+l+'</a>').join('') + '</nav>';

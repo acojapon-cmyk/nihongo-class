@@ -68,7 +68,7 @@ const q = new URLSearchParams(location.search); const S = q.get('s')==='kata' ? 
 const D = KANA[S], $ = id=>document.getElementById(id);
 $('ttl').textContent = D.name; document.title = D.name+' | 日本語クラス';
 $(S==='hira'?'swHira':'swKata').classList.add('on');
-$('lessonLink').href = 'lesson.html?n='+(S==='hira'?101:102);
+$('lessonLink').href = 't-1kn9824oom/lesson.html?n='+(S==='hira'?101:102);
 const cells = (secId)=>D.sections.filter(s=>!secId||secId==='all'||s.id===secId).flatMap(s=>s.rows.flatMap(r=>r.cells.filter(Boolean)));
 const usable = c=>D.words[c.c] && D.words[c.c].w.length;  // ことばがある文字
 let curSec = 'sei', pad = null;

@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><base href="../">
 <meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>語彙カード | 日本語クラス</title>
@@ -62,8 +62,8 @@ renderHeader('', '');
 const q = new URLSearchParams(location.search); const N = parseInt(q.get('n'))||1;
 const $ = id=>document.getElementById(id);
 $('lsel').innerHTML = LESSON_INDEX.map(l=>'<option value="'+l.n+'"'+(l.n===N?' selected':'')+'>'+esc(l.label)+' '+esc(l.title)+'</option>').join('');
-$('lsel').onchange = ()=>location.href='vocab.html?n='+$('lsel').value;
-$('toLesson').href = 'lesson.html?n='+N;
+$('lsel').onchange = ()=>location.href='t-1kn9824oom/vocab.html?n='+$('lsel').value;
+$('toLesson').href = 't-1kn9824oom/lesson.html?n='+N;
 let cards=[], all=[], idx=0, shown=false, ok=0, ng=0;
 loadLesson(N, L=>{
   if(!L){ $('stage').textContent='データがありません'; return; }
@@ -85,7 +85,7 @@ function draw(){
   $('stage').innerHTML = '<div class="big">'+esc(front)+'</div>' + (mode==='w' ? '' : '<div class="mid '+(shown?'':'hidden-ans')+'">'+esc(back)+'</div>');
   $('gtag').textContent = c.g; $('gtag').style.display = c.g?'inline-block':'none';
   $('pos').textContent=(idx+1)+' / '+cards.length; $('score').textContent='○'+ok+' ×'+ng; $('prog').style.width=(idx/cards.length*100)+'%';
-  const a=$('toSlide'); if(c.s){ a.href='lesson.html?n='+N+'&s='+c.s; a.textContent='スライド'+c.s+'を見る'; } else { a.textContent=''; }
+  const a=$('toSlide'); if(c.s){ a.href='t-1kn9824oom/lesson.html?n='+N+'&s='+c.s; a.textContent='スライド'+c.s+'を見る'; } else { a.textContent=''; }
 }
 function nxt(){ idx++; shown=false; draw(); }
 $('flip').onclick = ()=>{ shown=!shown; draw(); };

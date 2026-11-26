@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><base href="../">
 <meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>今日のまとめ・次回予告 | 日本語クラス</title>
@@ -62,8 +62,8 @@ body{background:#fff}
 const q = new URLSearchParams(location.search); const N = parseInt(q.get('n'))||1;
 const $ = id=>document.getElementById(id);
 $('lsel').innerHTML = LESSON_INDEX.map(l=>'<option value="'+l.n+'"'+(l.n===N?' selected':'')+'>'+esc(l.label)+' '+esc(l.title)+'</option>').join('');
-$('lsel').onchange = ()=>location.href='next.html?n='+$('lsel').value;
-$('back').href = 'lesson.html?n='+N; $('toReview').href = 'review.html?n='+N;
+$('lsel').onchange = ()=>location.href='t-1kn9824oom/next.html?n='+$('lsel').value;
+$('back').href = 't-1kn9824oom/lesson.html?n='+N; $('toReview').href = 't-1kn9824oom/review.html?n='+N;
 $('date').textContent = new Date().toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'short'});
 const KEY = 'nextpage:'+N; const saved = store.get(KEY, {});
 $('when').value = saved.when||''; $('msgIn').value = saved.msg||''; $('hwIn').value = saved.hw||'';

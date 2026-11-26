@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><base href="../">
 <meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>復習プリント | 日本語クラス</title>
@@ -115,8 +115,8 @@ renderHeader('', '');
 const q = new URLSearchParams(location.search); const N = parseInt(q.get('n'))||1;
 const $ = id=>document.getElementById(id), pad = n=>String(n).padStart(2,'0');
 $('lsel').innerHTML = LESSON_INDEX.map(l=>'<option value="'+l.n+'"'+(l.n===N?' selected':'')+'>'+esc(l.label)+' '+esc(l.title)+'</option>').join('');
-$('lsel').onchange = ()=>location.href='review.html?n='+$('lsel').value;
-$('toNext').href='next.html?n='+N; $('toLesson').href='lesson.html?n='+N;
+$('lsel').onchange = ()=>location.href='t-1kn9824oom/review.html?n='+$('lsel').value;
+$('toNext').href='t-1kn9824oom/next.html?n='+N; $('toLesson').href='t-1kn9824oom/lesson.html?n='+N;
 const cs = Students.cur(); $('stu').value = store.get('review:stu', cs? cs.name : '');
 $('dt').value = new Date().toISOString().slice(0,10);
 const SKEY='review:set:'+N; const set = store.get(SKEY, {});

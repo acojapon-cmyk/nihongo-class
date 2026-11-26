@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><base href="../../">
 <meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>質問・クイズ | 日本語クラス</title>
-<link rel="stylesheet" href="../css/style.css?v=20261126">
+<link rel="stylesheet" href="css/style.css?v=20261126">
 </head>
 <body>
 <main>
@@ -47,12 +47,12 @@
     <div class="row" style="margin-top:8px"><button class="btn-primary" id="saveBulk">保存</button></div>
   </section>
 </main>
-<script src="../data/index.js"></script>
-<script src="../data/quiz.js"></script>
-<script src="../js/app.js?v=20261126"></script>
-<script src="../js/quiz.js"></script>
+<script src="data/index.js"></script>
+<script src="data/quiz.js"></script>
+<script src="js/app.js?v=20261126"></script>
+<script src="js/quiz.js"></script>
 <script>
-renderHeader('pages/quiz.html','../');
+renderHeader('t-1kn9824oom/pages/quiz.html','');
 const $ = id => document.getElementById(id);
 function speak(t){ try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(String(t).replace(/\{[^}]*\}/g,'').replace(/[○]/g,'')); u.lang='ja-JP'; u.rate=.85; speechSynthesis.speak(u); }catch(e){} }
 const IDX = (window.LESSON_INDEX||[]).filter(l=>l.n<100||l.n===26 || true);
@@ -84,7 +84,7 @@ function oralCards(){
 }
 const cache = {};
 function loadL(n){ return new Promise(res=>{ if(cache[n]) return res(cache[n]); window.LESSONS = window.LESSONS||{}; if(window.LESSONS[n]) return res(cache[n]=window.LESSONS[n]);
-  const sc=document.createElement('script'); sc.src='../data/L'+String(n).padStart(2,'0')+'.js'; sc.onload=()=>res(cache[n]=window.LESSONS[n]); sc.onerror=()=>res(null); document.head.appendChild(sc); }); }
+  const sc=document.createElement('script'); sc.src='data/L'+String(n).padStart(2,'0')+'.js'; sc.onload=()=>res(cache[n]=window.LESSONS[n]); sc.onerror=()=>res(null); document.head.appendChild(sc); }); }
 async function mcQuestions(){
   const lessons = lessonsInScope(); const pairs=[];
   for(const n of lessons){ const L = await loadL(n); if(!L) continue;

@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><base href="../../">
 <meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Can-do説明資料 | 日本語クラス</title>
-<link rel="stylesheet" href="../css/style.css?v=20261126">
+<link rel="stylesheet" href="css/style.css?v=20261126">
 <style>
 main.wide{max-width:1300px}
 .tabs2{display:flex;gap:4px;margin:6px 0 12px;flex-wrap:wrap}
@@ -82,10 +82,10 @@ kbd{background:#eee;border:1px solid #ccc;border-radius:4px;padding:0 5px;font-s
 
   <section id="tLegend" style="display:none"><div class="card"><table class="cd" id="lg"></table></div></section>
 </main>
-<script src="../js/app.js?v=20261126"></script>
-<script src="../data/cando.js"></script>
+<script src="js/app.js?v=20261126"></script>
+<script src="data/cando.js"></script>
 <script>
-renderHeader('pages/cando.html','../');
+renderHeader('t-1kn9824oom/pages/cando.html','');
 const $=id=>document.getElementById(id), pad=n=>String(n).padStart(2,'0');
 const C=window.CANDO;
 let lang='jp', i=parseInt(localStorage.getItem('nj:cando:pos')||'1')||1;
@@ -93,7 +93,7 @@ let lang='jp', i=parseInt(localStorage.getItem('nj:cando:pos')||'1')||1;
 const jump=[]; C.jp.forEach((s,k)=>{ if(/Can-do$/.test(s.t)&&/第/.test(s.t)) jump.push([s.t.replace(/\s*Can-do$/,''),k+1]); else if(/ぜんたいマップ/.test(s.t)) jump.push([s.t.replace(/\s*[（(].*$/,'').replace(/\s/g,''),k+1]); else if(/ふりかえり/.test(s.t)){ const m=s.t.match(/第(\d+)〜(\d+)課/); jump.push(['ふりかえり'+(m?m[1]+'〜'+m[2]+'課':''),k+1]); } });
 $('chips').innerHTML=jump.map(([l,k])=>'<button data-k="'+k+'">'+esc(l)+'</button>').join('');
 document.querySelectorAll('#chips button').forEach(b=>b.onclick=()=>{i=+b.dataset.k;draw();});
-const src=n=>'../cando/'+lang+'/s-'+pad(n)+'.jpg';
+const src=n=>'cando/'+lang+'/s-'+pad(n)+'.jpg';
 function strip(){ $('strip').innerHTML=C[lang].map((s,k)=>'<img loading="lazy" data-i="'+(k+1)+'" src="'+src(k+1)+'" title="'+(k+1)+'">').join(''); document.querySelectorAll('.strip img').forEach(el=>el.onclick=()=>{i=+el.dataset.i;draw();}); }
 function draw(){
   const T=C[lang].length; i=Math.min(Math.max(i,1),T); localStorage.setItem('nj:cando:pos',i);
