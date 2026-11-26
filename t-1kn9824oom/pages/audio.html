@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><base href="../../">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>音声 | 日本語クラス</title>
+<link rel="stylesheet" href="css/style.css?v=20261126">
+<style>
+.trk{display:grid;grid-template-columns:64px 1fr 90px;gap:10px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line)}
+.trk.on{background:var(--accent-soft)} .trk .no{font-weight:700} .trk select{width:100%}
+.bar{position:sticky;top:0;z-index:5;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:12px}
+.bar audio{width:100%;margin-top:6px}
+@media(max-width:600px){.trk{grid-template-columns:52px 1fr}.trk .du{display:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1>音声 <span class="pill">みんなの日本語 初級 CD ・ <span id="cnt"></span></span></h1>
+  <p class="sub">番号順の一覧です。各トラックに「どの課か」を指定すると、課ごとに絞り込めます(指定はこのブラウザに保存されます)。</p>
+  <div class="bar">
+    <div class="row" style="align-items:center">
+      <b id="now">トラックを選んでください</b>
+      <span style="flex:1"></span>
+      <button id="prev">◀ 前</button><button id="next">次 ▶</button>
+      <label style="margin:0"><input type="checkbox" id="auto" checked> 次を自動再生</label>
+    </div>
+    <audio id="ap" controls preload="none"></audio>
+  </div>
+  <div class="row" style="margin-bottom:8px;align-items:center">
+    <label style="margin:0">表示</label>
+    <select id="flt" style="width:auto"></select>
+    <button id="exp">💾 割り当てを書き出す</button>
+  </div>
+  <section class="card" style="padding:0" id="list"></section>
+</main>
+<script src="data/index.js"></script>
+<script src="t-1kn9824oom/audio/tracks.js"></script>
+<script src="js/app.js?v=20261126c"></script>
+<script>
+renderHeader('t-1kn9824oom/pages/audio.html','');
+const $=id=>document.getElementById(id), A=window.MINNA_AUDIO, N=A.count;
+const pad=n=>String(n).padStart(3,'0'), fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+const lessons=(window.LESSON_INDEX||[]);
+const map=store.get('audioLesson',{}); let cur=0;
+$('cnt').textContent=N+'トラック';
+const opts=lessons.map(l=>'<option value="'+l.n+'">'+esc(l.label)+' '+esc(l.title||'')+'</option>').join('');
+$('flt').innerHTML='<option value="all">すべて</option><option value="none">未指定</option>'+opts;
+function visible(i){ const f=$('flt').value, m=map[i]; return f==='all'||(f==='none'?!m:String(m)===f); }
+function draw(){
+  $('list').innerHTML=Array.from({length:N},(_,k)=>k+1).filter(visible).map(i=>
+    '<div class="trk'+(i===cur?' on':'')+'" data-i="'+i+'"><button class="pl" data-i="'+i+'">▶ '+pad(i)+'</button>'+
+    '<select class="as" data-i="'+i+'"><option value="">課を指定…</option>'+opts.replace('value="'+(map[i]||'')+'"','value="'+(map[i]||'')+'" selected')+'</select>'+
+    '<span class="du sub">'+fmt(A.dur[i-1])+'</span></div>').join('')||'<div class="sub" style="padding:14px">該当するトラックはありません。</div>';
+  document.querySelectorAll('.pl').forEach(b=>b.onclick=()=>play(+b.dataset.i));
+  document.querySelectorAll('.as').forEach(s=>s.onchange=()=>{ const i=+s.dataset.i; if(s.value) map[i]=s.value; else delete map[i]; store.set('audioLesson',map); if($('flt').value!=='all') draw(); });
+}
+function play(i){ cur=i; const a=$('ap'); a.src=A.prefix+pad(i)+'.mp3'; a.play().catch(()=>{}); $('now').textContent='トラック '+pad(i)+(map[i]?'  ・ '+(lessons.find(l=>String(l.n)===String(map[i]))||{}).label+'':''); draw(); }
+function step(d){ let i=cur; do{ i+=d; }while(i>=1&&i<=N&&!visible(i)); if(i>=1&&i<=N) play(i); }
+$('prev').onclick=()=>step(-1); $('next').onclick=()=>step(1);
+$('ap').addEventListener('ended',()=>{ if($('auto').checked) step(1); });
+$('flt').onchange=draw;
+$('exp').onclick=()=>{ const b=new Blob([JSON.stringify(map,null,1)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='minna-audio-lessons.json'; a.click(); };
+draw();
+</script>
+</body>
+</html>
