@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>漢字 | 日本語クラス</title>
 <link rel="stylesheet" href="css/style.css?v=20261126">
-<style>.kanji2{grid-template-columns:minmax(0,1fr) minmax(320px,1.1fr)}@media(max-width:900px){.kanji2{grid-template-columns:minmax(0,1fr)}}.mobonly{display:none}@media(max-width:900px){.mobonly{display:inline-block}}</style>
+<style>.kanji2{grid-template-columns:minmax(0,1fr) minmax(320px,1.1fr)}@media(max-width:900px){.kanji2{grid-template-columns:minmax(0,1fr)}}.mobonly{display:none}@media(max-width:900px){.mobonly{display:inline-block}}@media(max-width:900px){#detail{min-height:calc(100vh - 16px);scroll-margin-top:8px}}</style>
 </head>
 <body>
 <main>
@@ -56,7 +56,7 @@
   <p class="sub" style="margin-top:20px;font-size:13px">漢字リスト: Langoal「JLPT N5・N4・N3」／イラスト: Twemoji © Twitter, Inc. and other contributors — CC BY 4.0</p>
 </main>
 <script src="data/index.js"></script><script src="data/kanji.js"></script>
-<script src="js/app.js?v=20261126b"></script><script src="js/pad.js"></script><script src="js/quiz.js"></script>
+<script src="js/app.js?v=20261126c"></script><script src="js/pad.js"></script><script src="js/quiz.js"></script>
 <script>
 renderHeader('', '');
 const $ = id=>document.getElementById(id);
@@ -70,7 +70,7 @@ function drawGroups(){
 function drawGrid(){
   const it = items(); $('cnt').textContent = 'N'+LV+' · '+it.length+'字';
   $('kgrid').innerHTML = it.map(k=>'<button class="kc" data-n="'+k.no+'">'+esc(k.k)+'<small>'+esc(k.m.split(/[;,]/)[0])+'</small></button>').join('');
-  document.querySelectorAll('#kgrid .kc').forEach(b=>b.onclick=()=>{ show(+b.dataset.n); if(window.matchMedia('(max-width:900px)').matches) setTimeout(()=>$('detail').scrollIntoView({behavior:'smooth',block:'start'}),50); });
+  document.querySelectorAll('#kgrid .kc').forEach(b=>b.onclick=()=>{ show(+b.dataset.n); if(window.matchMedia('(max-width:900px)').matches) setTimeout(()=>$('detail').scrollIntoView({behavior:'smooth',block:'start'}),150); });
 }
 function show(no){
   const k = KANJI[LV].items.find(x=>x.no===no); if(!k) return; curK = k;

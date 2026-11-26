@@ -7,7 +7,7 @@
 <title>ひらがな・カタカナ | 日本語クラス</title>
 <link rel="stylesheet" href="css/style.css?v=20261126">
 <style>.kana2{grid-template-columns:minmax(0,1.15fr) minmax(300px,1fr)}@media(max-width:900px){.kana2{grid-template-columns:minmax(0,1fr)}}.chart{display:block;overflow-x:auto}</style>
-<style>.mobonly{display:none}@media(max-width:900px){.mobonly{display:inline-block}}</style>
+<style>.mobonly{display:none}@media(max-width:900px){.mobonly{display:inline-block}}@media(max-width:900px){#detail{min-height:calc(100vh - 16px);scroll-margin-top:8px}}</style>
 </head>
 <body>
 <main>
@@ -62,7 +62,7 @@
   </div>
 </main>
 <script src="data/index.js"></script><script src="data/kana.js"></script>
-<script src="js/app.js?v=20261126b"></script><script src="js/pad.js"></script><script src="js/quiz.js"></script>
+<script src="js/app.js?v=20261126c"></script><script src="js/pad.js"></script><script src="js/quiz.js"></script>
 <script>
 renderHeader('', '');
 const q = new URLSearchParams(location.search); const S = q.get('s')==='kata' ? 'kata' : 'hira';
@@ -86,7 +86,7 @@ document.querySelectorAll('#secs .chip').forEach(b=>b.onclick=()=>{ curSec=b.dat
 function drawChart(){
   const sec = D.sections.find(s=>s.id===curSec);
   $('chart').innerHTML = sec.rows.map(r=>'<tr><th>'+esc(r.l)+'</th>'+r.cells.map(c=>c?'<td><button class="kc" data-c="'+esc(c.c)+'">'+esc(c.c)+'<small>'+esc(c.r)+'</small></button></td>':'<td></td>').join('')+'</tr>').join('');
-  document.querySelectorAll('#chart .kc').forEach(b=>b.onclick=()=>{ showChar(b.dataset.c); if(window.matchMedia('(max-width:900px)').matches) setTimeout(()=>$('detail').scrollIntoView({behavior:'smooth',block:'start'}),50); });
+  document.querySelectorAll('#chart .kc').forEach(b=>b.onclick=()=>{ showChar(b.dataset.c); if(window.matchMedia('(max-width:900px)').matches) setTimeout(()=>$('detail').scrollIntoView({behavior:'smooth',block:'start'}),150); });
 }
 function hl(word, ch){ const e=esc(word), c=esc(ch); return ch.length? e.split(c).join('<mark>'+c+'</mark>') : e; }
 function showChar(ch){
