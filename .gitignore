@@ -9,3 +9,6 @@ images-*/
 # いろどり(irodori/)は授業で使うため、スライド・Can-do画像・本冊PDF・音声も含める
 !/irodori/slides/
 !/irodori/cando/
+
+# みんなの日本語のCan-do説明資料スライド画像は公開する
+!/cando/
