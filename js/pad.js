@@ -1,8 +1,22 @@
 /* 書く練習パッド: うすい見本をなぞる / 自由に書く */
+/* 音声: いちばん自然な日本語の声を選ぶ(Microsoft Natural / Google / Apple 高品質を優先) */
+function pickJaVoice(){
+  const vs=(window.speechSynthesis?speechSynthesis.getVoices():[]).filter(v=>v.lang&&/^ja/i.test(v.lang.replace('_','-')));
+  if(!vs.length) return null;
+  const score=v=>{const n=v.name; let s=0;
+    if(/Natural|Neural|Online/i.test(n)) s+=100;
+    if(/Nanami|Keita|Mayu|Naoki|Shiori|Daichi/i.test(n)) s+=20;
+    if(/Google/i.test(n)) s+=60;
+    if(/Premium|Enhanced|Siri|O-?Ren|Kyoko|Otoya/i.test(n)) s+=40;
+    if(/Haruka|Ayumi|Ichiro|Sayaka/i.test(n)) s-=10;
+    return s;};
+  return vs.slice().sort((a,b)=>score(b)-score(a))[0];
+}
+if(window.speechSynthesis) speechSynthesis.onvoiceschanged=()=>{};
 function speak(text){
   try{ if(!('speechSynthesis' in window)) { toast('このブラウザは音声に対応していません'); return; }
-    const u = new SpeechSynthesisUtterance(text); u.lang='ja-JP'; u.rate=0.8;
-    const v = speechSynthesis.getVoices().find(v=>v.lang && v.lang.startsWith('ja')); if(v) u.voice=v; else if(!speechSynthesis.getVoices().length) {}
+    const u = new SpeechSynthesisUtterance(text); u.lang='ja-JP'; u.rate=0.9;
+    const v = pickJaVoice(); if(v) u.voice=v;
     speechSynthesis.cancel(); speechSynthesis.speak(u);
   }catch(e){}
 }
