@@ -1,4 +1,5 @@
 /* 生徒用ページ共通 */
+function ttsText(t){ t=String(t).replace(/\{[^}]*\}/g,'').replace(/[○]/g,'').replace(/[（(][^）)]*[）)]/g,'').replace(/^[A-ZＡ-Ｚ][:：]\s*/,'').replace(/[…‥]+/g,'、').replace(/\s+/g,' ').trim(); if(/^[ぁ-んァ-ヶ]$/.test(t)&&t!=='ー') t=t+'。'; return t; }
 /* 音声: いちばん自然な日本語の声を選ぶ(Microsoft Natural / Google / Apple 高品質を優先) */
 function pickJaVoice(){
   const vs=(window.speechSynthesis?speechSynthesis.getVoices():[]).filter(v=>v.lang&&/^ja/i.test(v.lang.replace('_','-')));
@@ -29,7 +30,7 @@ const S = {
     el.innerHTML=S.order().map(x=>'<option value="'+x+'">'+esc(S.label(x))+'</option>').join(''); el.value=n;
     el.onchange=()=>{ S.save(+el.value); cb(+el.value); };
   },
-  speak(t){ try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(String(t).replace(/\{[^}]*\}/g,'').replace(/[○]/g,'')); u.lang='ja-JP'; u.rate=.9; const v=(typeof pickJaVoice==='function')?pickJaVoice():null; if(v) u.voice=v; speechSynthesis.speak(u); }catch(e){} },
+  speak(t){ try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(ttsText(t)); u.lang='ja-JP'; u.rate=.9; const v=(typeof pickJaVoice==='function')?pickJaVoice():null; if(v) u.voice=v; speechSynthesis.speak(u); }catch(e){} },
   shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 };
 function speak(t){ S.speak(t); }
